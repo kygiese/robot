@@ -1,0 +1,20 @@
+0 wheels
+1 wheels not working
+2 waist
+3 head pan
+4 head tilt
+
+5 right arm shoulder y
+6 right arm shoulder x
+7 right arm elbow
+8 right arm wrist y
+9 right arm wrist x
+10 right arm claw
+
+5 left arm shoulder y
+6 left arm shoulder x
+7 left arm elbow
+8 left arm wrist y
+9 left arm wrist x
+10 left arm claw
+
