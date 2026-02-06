@@ -1,0 +1,12 @@
+2/5
+- servo max/min
+- servo list w/ numbers
+- motor control?????
+
+
+2/6 lab goals
+- minimum: servo assignments, range, individual control
+- goal: full control running locally
+- stretch: full control locally + connect to app
+
+
