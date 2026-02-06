@@ -3,10 +3,10 @@ import maestro
 WAIST = 0
 
 class Waist:
-    def __init__(self):
+    def __init__(self, min, max):
         self.controller = maestro.Controller()
+        self.controller.setRange(WAIST, min, max)
 
     def turn(self, target):
-        self.controller.setSpeed(0, 1)
-        self.controller.setTarget(target)
+        self.controller.setTarget(WAIST, target)
 

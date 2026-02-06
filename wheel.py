@@ -1,16 +1,29 @@
+from time import sleep
+
 import maestro
 
+LEFT_WHEEL = 0
+RIGHT_WHEEL = 1
+CENTER = 6000
 
 class Wheel:
-    left_wheel = 0
-    right_wheel = 1
-    def __init__(self):
+
+    def __init__(self, min, max):
         self.motor = maestro.Controller()
+        self.motor.setRange(LEFT_WHEEL, min, max)
+        self.motor.setRange(RIGHT_WHEEL, min, max)
 
-    def forward(self, speed):
-        self.motor.setSpeed(0, speed)
-        self.motor.setSpeed(1, speed)
+    def forward(self, n):
+        self.motor.setTarget(LEFT_WHEEL, 4000)
+        self.motor.setTarget(RIGHT_WHEEL, 4000)
+        sleep(n)
+        self.motor.setTarget(LEFT_WHEEL, CENTER)
+        self.motor.setTarget(RIGHT_WHEEL, CENTER)
 
-    def backward(self, speed):
-        self.motor.setSpeed(0, -speed)
-        self.motor.setSpeed(0, -speed)
+
+    def backward(self, n):
+        self.motor.setTarget(LEFT_WHEEL, 7000)
+        self.motor.setTarget(RIGHT_WHEEL, 7000)
+        sleep(n)
+        self.motor.setTarget(LEFT_WHEEL, CENTER)
+        self.motor.setTarget(RIGHT_WHEEL, CENTER)
