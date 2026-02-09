@@ -610,7 +610,9 @@
         // Handle page refresh/close - send stop command
         window.addEventListener('beforeunload', function(e) {
             // Try to stop robot before page unloads
-            navigator.sendBeacon('/api/stop', JSON.stringify({}));
+            // Use Blob with correct content-type for JSON
+            const blob = new Blob([JSON.stringify({})], { type: 'application/json' });
+            navigator.sendBeacon('/api/stop', blob);
         });
         
         // Handle page visibility change (tab switch, minimize)
