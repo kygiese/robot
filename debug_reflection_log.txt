@@ -1,0 +1,28 @@
+we need dated entries (6 i think)
+turned in separately
+1 incorrect assumption we had
+ugh why
+
+Friday 2/6 (in class):
+-tested basic test code
+-tested head and waist motion in robot control layer
+-fixed jumper set up to get separate control of each wheel, but still not working
+    -EDIT: this is because in the gui version of maestro, wheel 1 must be enabled for wheel 2 to work
+
+Sunday 2/8
+-all movement is working
+-base python test is complete
+-robot control layer has first working draft
+    -sometimes it doesn't drive, and we don't know why
+    -but other than that everything is working
+-it is really fast, need to make sure we can change the speed
+-made waist movement safer by reducing speed
+-added safe limits for arm elbow motion (discovered left and right arms are not the same)
+-flask app in second draft, todos include
+    -turn handling
+    -safe failure
+
+
+Monday 2/9
+-code writing
+-tests fixed to reflect deliverable

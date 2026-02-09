@@ -1,6 +1,6 @@
 import maestro
-HEAD_PAN = 0
-HEAD_TILT = 1
+HEAD_PAN = 3
+HEAD_TILT = 4
 
 class Head:
 
