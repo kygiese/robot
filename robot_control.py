@@ -6,6 +6,11 @@ This module provides a unified interface for controlling the robot's:
 - Head (pan and tilt)
 - Waist (rotation)
 
+Uses the hierarchical component structure from robot.py:
+- wheel.Wheel for wheel control
+- head.Head for head control
+- waist.Waist for waist control
+
 All functions enforce safe limits and provide a STOP/neutral state.
 This layer is callable directly from Python for testing.
 """
@@ -13,62 +18,74 @@ This layer is callable directly from Python for testing.
 import threading
 import time
 
-# Try to import maestro, but allow mock mode for testing
-try:
-    import maestro
-    MOCK_MODE = False
-except (ImportError, Exception):
-    MOCK_MODE = True
-
-# Servo channel assignments (based on servo_assignments.txt)
-LEFT_WHEEL = 0
-RIGHT_WHEEL = 1  # Note: may not be working per servo_assignments.txt
-WAIST_CHANNEL = 2
-HEAD_PAN_CHANNEL = 3
-HEAD_TILT_CHANNEL = 4
-
 # Safe limits for servo positions (quarter-microseconds)
 # Standard servo range is 3000-9000, center at 6000
 SERVO_MIN = 4000
 SERVO_MAX = 8000
 SERVO_CENTER = 6000
 
-# Wheel-specific values (continuous rotation servos)
-WHEEL_STOP = 6000  # Neutral/stopped position
-WHEEL_MIN_SPEED = 4000  # Full speed one direction
-WHEEL_MAX_SPEED = 8000  # Full speed other direction
+# Try to import component modules
+try:
+    import wheel
+    import head
+    import waist
+    MOCK_MODE = False
+except (ImportError, Exception):
+    MOCK_MODE = True
 
 
-class MockController:
-    """Mock controller for testing without hardware"""
-    def __init__(self, ttyStr=None, device=None):
-        self.Targets = [SERVO_CENTER] * 24
-        self.Mins = [0] * 24
-        self.Maxs = [0] * 24
+class MockWheel:
+    """Mock wheel controller for testing without hardware"""
+    def __init__(self, min_val, max_val):
+        self.left_target = SERVO_CENTER
+        self.right_target = SERVO_CENTER
         
-    def setRange(self, chan, min_val, max_val):
-        self.Mins[chan] = min_val
-        self.Maxs[chan] = max_val
+    def setLeftSpeed(self, target):
+        self.left_target = target
         
-    def setTarget(self, chan, target):
-        # Enforce limits
-        if self.Mins[chan] > 0 and target < self.Mins[chan]:
-            target = self.Mins[chan]
-        if self.Maxs[chan] > 0 and target > self.Maxs[chan]:
-            target = self.Maxs[chan]
-        self.Targets[chan] = target
+    def setRightSpeed(self, target):
+        self.right_target = target
         
-    def getPosition(self, chan):
-        return self.Targets[chan]
+    def stop(self):
+        self.left_target = SERVO_CENTER
+        self.right_target = SERVO_CENTER
+
+
+class MockHead:
+    """Mock head controller for testing without hardware"""
+    def __init__(self, min_val, max_val):
+        self.pan_target = SERVO_CENTER
+        self.tilt_target = SERVO_CENTER
         
-    def close(self):
-        pass
+    def pan(self, target):
+        self.pan_target = target
+        
+    def tilt(self, target):
+        self.tilt_target = target
+        
+    def center(self):
+        self.pan_target = SERVO_CENTER
+        self.tilt_target = SERVO_CENTER
+
+
+class MockWaist:
+    """Mock waist controller for testing without hardware"""
+    def __init__(self, min_val, max_val):
+        self.target = SERVO_CENTER
+        
+    def turn(self, target):
+        self.target = target
 
 
 class RobotControl:
     """
     Main robot control class that provides safe, validated control
     of all robot functions.
+    
+    Uses hierarchical component structure:
+    - self._wheels: Wheel component for drive control
+    - self._head: Head component for pan/tilt control  
+    - self._waist_component: Waist component for rotation control
     
     Thread-safe and independent of Flask.
     """
@@ -78,7 +95,7 @@ class RobotControl:
         Initialize the robot control layer.
         
         Args:
-            mock_mode: If True, use mock controller. If None, auto-detect.
+            mock_mode: If True, use mock controllers. If None, auto-detect.
         """
         self._lock = threading.Lock()
         self._mock_mode = mock_mode if mock_mode is not None else MOCK_MODE
@@ -86,9 +103,9 @@ class RobotControl:
         # Current state tracking
         self._left_wheel_speed = 0
         self._right_wheel_speed = 0
-        self._head_pan = 0  # -100 to 100
-        self._head_tilt = 0  # -100 to 100
-        self._waist = 0  # -100 to 100
+        self._head_pan_pos = 0  # -100 to 100
+        self._head_tilt_pos = 0  # -100 to 100
+        self._waist_pos = 0  # -100 to 100
         
         # Heartbeat for connection monitoring
         self._last_command_time = time.time()
@@ -96,35 +113,36 @@ class RobotControl:
         self._safety_thread = None
         self._running = False
         
-        # Initialize controller
-        self._init_controller()
+        # Initialize components using hierarchical structure
+        self._init_components()
         
         # Start safety monitoring
         self._start_safety_monitor()
     
-    def _init_controller(self):
-        """Initialize the servo controller"""
+    def _init_components(self):
+        """Initialize the robot components using hierarchical structure"""
         try:
             if self._mock_mode:
-                self._controller = MockController()
+                # Use mock components for testing
+                self._wheels = MockWheel(SERVO_MIN, SERVO_MAX)
+                self._head = MockHead(SERVO_MIN, SERVO_MAX)
+                self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
             else:
-                self._controller = maestro.Controller()
-            
-            # Set safe ranges for all servos
-            self._controller.setRange(LEFT_WHEEL, WHEEL_MIN_SPEED, WHEEL_MAX_SPEED)
-            self._controller.setRange(RIGHT_WHEEL, WHEEL_MIN_SPEED, WHEEL_MAX_SPEED)
-            self._controller.setRange(WAIST_CHANNEL, SERVO_MIN, SERVO_MAX)
-            self._controller.setRange(HEAD_PAN_CHANNEL, SERVO_MIN, SERVO_MAX)
-            self._controller.setRange(HEAD_TILT_CHANNEL, SERVO_MIN, SERVO_MAX)
+                # Use real hardware components
+                self._wheels = wheel.Wheel(SERVO_MIN, SERVO_MAX)
+                self._head = head.Head(SERVO_MIN, SERVO_MAX)
+                self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
             
             # Set to neutral/center position
             self.stop()
             
         except Exception as e:
-            print(f"Warning: Could not initialize hardware controller: {e}")
+            print(f"Warning: Could not initialize hardware components: {e}")
             print("Running in mock mode")
             self._mock_mode = True
-            self._controller = MockController()
+            self._wheels = MockWheel(SERVO_MIN, SERVO_MAX)
+            self._head = MockHead(SERVO_MIN, SERVO_MAX)
+            self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
     
     def _start_safety_monitor(self):
         """Start the safety monitoring thread"""
@@ -169,7 +187,7 @@ class RobotControl:
         # Map -100...100 to 4000...8000
         # 0 -> 6000, -100 -> 4000, 100 -> 8000
         servo_value = int(SERVO_CENTER + (speed / 100.0) * (SERVO_MAX - SERVO_CENTER))
-        return max(WHEEL_MIN_SPEED, min(WHEEL_MAX_SPEED, servo_value))
+        return max(SERVO_MIN, min(SERVO_MAX, servo_value))
     
     def _position_to_servo(self, position):
         """
@@ -187,8 +205,14 @@ class RobotControl:
         left_servo = self._speed_to_servo(left_speed)
         right_servo = self._speed_to_servo(right_speed)
         
-        self._controller.setTarget(LEFT_WHEEL, left_servo)
-        self._controller.setTarget(RIGHT_WHEEL, right_servo)
+        # Use wheel component methods
+        if hasattr(self._wheels, 'setLeftSpeed'):
+            self._wheels.setLeftSpeed(left_servo)
+            self._wheels.setRightSpeed(right_servo)
+        elif hasattr(self._wheels, 'motor'):
+            # Direct access for original Wheel class
+            self._wheels.motor.setTarget(0, left_servo)  # LEFT_WHEEL
+            self._wheels.motor.setTarget(1, right_servo)  # RIGHT_WHEEL
     
     def heartbeat(self):
         """
@@ -206,18 +230,17 @@ class RobotControl:
         with self._lock:
             self._last_command_time = time.time()
             
-            # Stop wheels
+            # Stop wheels using wheel component
             self._set_wheel_speeds_internal(0, 0)
             
-            # Center head
-            self._head_pan = 0
-            self._head_tilt = 0
-            self._controller.setTarget(HEAD_PAN_CHANNEL, SERVO_CENTER)
-            self._controller.setTarget(HEAD_TILT_CHANNEL, SERVO_CENTER)
+            # Center head using head component
+            self._head_pan_pos = 0
+            self._head_tilt_pos = 0
+            self._head.center()
             
-            # Center waist
-            self._waist = 0
-            self._controller.setTarget(WAIST_CHANNEL, SERVO_CENTER)
+            # Center waist using waist component
+            self._waist_pos = 0
+            self._waist_component.turn(SERVO_CENTER)
         
         return {"status": "ok", "message": "Robot stopped"}
     
@@ -277,6 +300,7 @@ class RobotControl:
     def head_pan(self, position):
         """
         Control head pan (left/right rotation).
+        Uses the head component for control.
         
         Args:
             position: Pan position (-100 to 100, left to right)
@@ -288,9 +312,10 @@ class RobotControl:
         
         with self._lock:
             self._last_command_time = time.time()
-            self._head_pan = position
+            self._head_pan_pos = position
             servo_value = self._position_to_servo(position)
-            self._controller.setTarget(HEAD_PAN_CHANNEL, servo_value)
+            # Use head component's pan method
+            self._head.pan(servo_value)
         
         return {
             "status": "ok",
@@ -300,6 +325,7 @@ class RobotControl:
     def head_tilt(self, position):
         """
         Control head tilt (up/down).
+        Uses the head component for control.
         
         Args:
             position: Tilt position (-100 to 100, down to up)
@@ -311,18 +337,20 @@ class RobotControl:
         
         with self._lock:
             self._last_command_time = time.time()
-            self._head_tilt = position
+            self._head_tilt_pos = position
             servo_value = self._position_to_servo(position)
-            self._controller.setTarget(HEAD_TILT_CHANNEL, servo_value)
+            # Use head component's tilt method
+            self._head.tilt(servo_value)
         
         return {
             "status": "ok",
             "head_tilt": position
         }
     
-    def waist(self, position):
+    def waist_rotate(self, position):
         """
         Control waist rotation.
+        Uses the waist component for control.
         
         Args:
             position: Waist position (-100 to 100, left to right)
@@ -334,14 +362,20 @@ class RobotControl:
         
         with self._lock:
             self._last_command_time = time.time()
-            self._waist = position
+            self._waist_pos = position
             servo_value = self._position_to_servo(position)
-            self._controller.setTarget(WAIST_CHANNEL, servo_value)
+            # Use waist component's turn method
+            self._waist_component.turn(servo_value)
         
         return {
             "status": "ok",
             "waist": position
         }
+    
+    # Backward compatibility alias
+    def waist(self, position):
+        """Alias for waist_rotate for backward compatibility"""
+        return self.waist_rotate(position)
     
     def get_state(self):
         """
@@ -354,9 +388,9 @@ class RobotControl:
             return {
                 "left_wheel_speed": self._left_wheel_speed,
                 "right_wheel_speed": self._right_wheel_speed,
-                "head_pan": self._head_pan,
-                "head_tilt": self._head_tilt,
-                "waist": self._waist,
+                "head_pan": self._head_pan_pos,
+                "head_tilt": self._head_tilt_pos,
+                "waist": self._waist_pos,
                 "mock_mode": self._mock_mode
             }
     
@@ -364,8 +398,12 @@ class RobotControl:
         """Cleanup and shutdown the robot control"""
         self._running = False
         self.stop()
-        if hasattr(self._controller, 'close'):
-            self._controller.close()
+        # Close component controllers if they have close methods
+        for component in [self._wheels, self._head, self._waist_component]:
+            if hasattr(component, 'controller') and hasattr(component.controller, 'close'):
+                component.controller.close()
+            elif hasattr(component, 'motor') and hasattr(component.motor, 'close'):
+                component.motor.close()
 
 
 # Predefined phrases for voice output
