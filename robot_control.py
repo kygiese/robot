@@ -408,10 +408,10 @@ class RobotControl:
 
 # Predefined phrases for voice output
 PHRASES = [
-    "Hello, Hunter.",
-    "Hunter is so cool.",
+    "Maybe Sisyphus wasn't happy.",
+    "My favorite food is enriched uranium.",
     "Please do not touch my wheels.",
-    "Hunter is the greatest."
+    "Bread before toasters."
 ]
 
 
