@@ -256,7 +256,7 @@ def api_speak():
         # Try to speak using espeak (common on Raspberry Pi)
         def speak_async(text):
             try:
-                subprocess.run(["espeak", text], timeout=10, capture_output=True)
+                subprocess.run(["espeak", text, " -s", "100"], timeout=10, capture_output=True)
             except FileNotFoundError:
                 # espeak not installed, try alternative
                 try:

@@ -286,7 +286,7 @@ class RobotControl:
         # Convert joystick to differential drive
         # y = forward/backward, x = turning
         # Simple mixing: left = y + x, right = y - x
-        left_speed = y + x
+        left_speed = -y - x
         right_speed = y - x
         
         # Normalize if values exceed limits
