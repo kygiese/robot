@@ -43,3 +43,4 @@ class Robot:
         sleep(1)
         self.waist.center()
         sleep(1)
+

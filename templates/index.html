@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Robot Control Interface</title>
+    <script src="{{ url_for('static', filename='joy.js') }}"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #00ff88;
+            margin: 10px 0;
+            font-size: 1.5em;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .status-bar {
+            background: #16213e;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+        }
+        
+        .status-dot.connected {
+            background: #00ff88;
+        }
+        
+        .stop-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        
+        .stop-btn:hover {
+            background: #ff6666;
+        }
+        
+        .stop-btn:active {
+            background: #cc0000;
+        }
+        
+        .section {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .section h2 {
+            margin: 0 0 15px 0;
+            color: #00ff88;
+            font-size: 1.1em;
+            border-bottom: 1px solid #0f3460;
+            padding-bottom: 8px;
+        }
+        
+        /* Drive Control */
+        .drive-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #joyDiv {
+            width: 200px;
+            height: 200px;
+            margin: 10px auto;
+        }
+        
+        .drive-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
+        }
+        
+        .info-box {
+            background: #0f3460;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .info-box label {
+            display: block;
+            font-size: 0.75em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .info-box span {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        /* Sliders */
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-container label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .slider-container input[type="range"] {
+            width: 100%;
+            height: 30px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0f3460;
+            border-radius: 15px;
+            outline: none;
+        }
+        
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+        }
+        
+        .slider-container input[type="range"]::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .slider-value {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        
+        .center-btn {
+            background: #0f3460;
+            color: #00ff88;
+            border: 1px solid #00ff88;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .center-btn:hover {
+            background: #00ff88;
+            color: #0f3460;
+        }
+        
+        /* Voice Buttons */
+        .voice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .voice-btn {
+            background: #0f3460;
+            color: #eee;
+            border: 2px solid #00ff88;
+            padding: 15px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .voice-btn:hover {
+            background: #00ff88;
+            color: #0f3460;
+        }
+        
+        .voice-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Responsive */
+        @media (max-width: 500px) {
+            .voice-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #joyDiv {
+                width: 180px;
+                height: 180px;
+            }
+        }
+        
+        /* Data flow info */
+        .data-flow {
+            font-size: 0.7em;
+            color: #666;
+            margin-top: 10px;
+            padding: 8px;
+            background: #0a0a15;
+            border-radius: 4px;
+        }
+        
+        .debug-panel {
+            background: #0a0a15;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.75em;
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .debug-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+            background: #16213e;
+            border-radius: 3px;
+        }
+        
+        .debug-entry.error {
+            background: #4a1616;
+            color: #ff8888;
+        }
+        
+        .debug-entry.success {
+            color: #88ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Robot Control</h1>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Connecting...</span>
+            </div>
+            <button class="stop-btn" id="stopBtn" onclick="emergencyStop()">⚠️ STOP</button>
+        </div>
+        
+        <!-- Drive Control Section -->
+        <div class="section">
+            <h2>🎮 Drive Control</h2>
+            <div class="drive-section">
+                <div id="joyDiv"></div>
+                <div class="drive-info">
+                    <div class="info-box">
+                        <label>Left Wheel</label>
+                        <span id="leftSpeed">0</span>
+                    </div>
+                    <div class="info-box">
+                        <label>Right Wheel</label>
+                        <span id="rightSpeed">0</span>
+                    </div>
+                    <div class="info-box">
+                        <label>Direction</label>
+                        <span id="direction">C</span>
+                    </div>
+                    <div class="info-box">
+                        <label>Speed</label>
+                        <span id="speedVal">0%</span>
+                    </div>
+                </div>
+                <div class="data-flow">
+                    Data Flow: Joystick X,Y → Server validates (-100 to 100) → Converts to wheel speeds → Motor commands
+                </div>
+            </div>
+        </div>
+        
+        <!-- Head Control Section -->
+        <div class="section">
+            <h2>👤 Head Control</h2>
+            
+            <div class="slider-container">
+                <label>
+                    <span>Pan (Left/Right)</span>
+                    <span class="slider-value" id="panValue">0</span>
+                    <button class="center-btn" onclick="centerPan()">Center</button>
+                </label>
+                <input type="range" id="panSlider" min="-100" max="100" value="0" 
+                       oninput="updatePan(this.value)" onchange="sendPan(this.value)">
+            </div>
+            
+            <div class="slider-container">
+                <label>
+                    <span>Tilt (Up/Down)</span>
+                    <span class="slider-value" id="tiltValue">0</span>
+                    <button class="center-btn" onclick="centerTilt()">Center</button>
+                </label>
+                <input type="range" id="tiltSlider" min="-100" max="100" value="0"
+                       oninput="updateTilt(this.value)" onchange="sendTilt(this.value)">
+            </div>
+            
+            <div class="data-flow">
+                Data Flow: Slider value → Server validates (-100 to 100) → Servo position (4000-8000) → Head movement
+            </div>
+        </div>
+        
+        <!-- Waist Control Section -->
+        <div class="section">
+            <h2>🔄 Waist Control</h2>
+            
+            <div class="slider-container">
+                <label>
+                    <span>Rotation</span>
+                    <span class="slider-value" id="waistValue">0</span>
+                    <button class="center-btn" onclick="centerWaist()">Center</button>
+                </label>
+                <input type="range" id="waistSlider" min="-100" max="100" value="0"
+                       oninput="updateWaist(this.value)" onchange="sendWaist(this.value)">
+            </div>
+            
+            <div class="data-flow">
+                Data Flow: Slider value → Server validates (-100 to 100) → Servo position → Waist rotation
+            </div>
+        </div>
+        
+        <!-- Voice Output Section -->
+        <div class="section">
+            <h2>🔊 Voice Output</h2>
+            <div class="voice-grid">
+                <button class="voice-btn" onclick="speak(0)">👋 "Hello, Hunter."</button>
+                <button class="voice-btn" onclick="speak(1)">😎 "Hunter is so cool."</button>
+                <button class="voice-btn" onclick="speak(2)">🚫 "Please do not touch my wheels."</button>
+                <button class="voice-btn" onclick="speak(3)">🏆 "Hunter is the greatest."</button>
+            </div>
+        </div>
+        
+        <!-- Debug Panel -->
+        <div class="section">
+            <h2>📊 Debug Log</h2>
+            <div class="debug-panel" id="debugPanel"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // ============== Configuration ==============
+        const API_BASE = '';  // Same origin
+        const HEARTBEAT_INTERVAL = 1000;  // 1 second
+        const DRIVE_SEND_INTERVAL = 100;  // 100ms between drive commands
+        
+        // ============== State Variables ==============
+        let isConnected = false;
+        let lastDriveSent = 0;
+        let currentJoyX = 0;
+        let currentJoyY = 0;
+        let heartbeatInterval = null;
+        let driveInterval = null;
+        
+        // ============== Debug Logging ==============
+        function log(message, type = 'info') {
+            const panel = document.getElementById('debugPanel');
+            const entry = document.createElement('div');
+            entry.className = 'debug-entry ' + type;
+            const time = new Date().toLocaleTimeString();
+            entry.textContent = `[${time}] ${message}`;
+            panel.insertBefore(entry, panel.firstChild);
+            
+            // Keep only last 20 entries
+            while (panel.children.length > 20) {
+                panel.removeChild(panel.lastChild);
+            }
+        }
+        
+        // ============== API Functions ==============
+        async function apiPost(endpoint, data) {
+            try {
+                const response = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.status === 429) {
+                    // Rate limited, ignore silently
+                    return { status: 'rate_limited' };
+                }
+                
+                const result = await response.json();
+                updateConnectionStatus(true);
+                return result;
+            } catch (error) {
+                updateConnectionStatus(false);
+                log(`Error: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+        
+        // ============== Connection Status ==============
+        function updateConnectionStatus(connected) {
+            isConnected = connected;
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                text.textContent = 'Connected';
+            } else {
+                dot.classList.remove('connected');
+                text.textContent = 'Disconnected';
+            }
+        }
+        
+        // ============== Heartbeat ==============
+        function startHeartbeat() {
+            heartbeatInterval = setInterval(async () => {
+                try {
+                    await apiPost('/api/heartbeat', {});
+                } catch (error) {
+                    // Connection lost - will be handled by updateConnectionStatus
+                }
+            }, HEARTBEAT_INTERVAL);
+        }
+        
+        // ============== Drive Control ==============
+        function sendDriveCommand() {
+            const now = Date.now();
+            if (now - lastDriveSent < DRIVE_SEND_INTERVAL) {
+                return; // Rate limit
+            }
+            lastDriveSent = now;
+            
+            apiPost('/api/drive', { x: currentJoyX, y: currentJoyY })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        document.getElementById('leftSpeed').textContent = Math.round(result.left_speed);
+                        document.getElementById('rightSpeed').textContent = Math.round(result.right_speed);
+                    }
+                })
+                .catch(() => {});
+        }
+        
+        function startDriveLoop() {
+            driveInterval = setInterval(() => {
+                if (currentJoyX !== 0 || currentJoyY !== 0) {
+                    sendDriveCommand();
+                }
+            }, DRIVE_SEND_INTERVAL);
+        }
+        
+        // ============== Joystick Setup ==============
+        var Joy1 = new JoyStick('joyDiv', {
+            internalFillColor: '#00ff88',
+            internalStrokeColor: '#008855',
+            externalStrokeColor: '#00ff88'
+        }, function(stickData) {
+            currentJoyX = parseInt(stickData.x);
+            currentJoyY = parseInt(stickData.y);
+            
+            // Update display
+            document.getElementById('direction').textContent = stickData.cardinalDirection;
+            const speed = Math.round(Math.sqrt(currentJoyX * currentJoyX + currentJoyY * currentJoyY));
+            document.getElementById('speedVal').textContent = Math.min(speed, 100) + '%';
+            
+            // Send command immediately on joystick move
+            sendDriveCommand();
+        });
+        
+        // ============== Head Control ==============
+        function updatePan(value) {
+            document.getElementById('panValue').textContent = value;
+        }
+        
+        function sendPan(value) {
+            apiPost('/api/head/pan', { position: parseInt(value) })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log(`Pan set to ${result.head_pan}`, 'success');
+                    }
+                })
+                .catch(() => {});
+        }
+        
+        function centerPan() {
+            document.getElementById('panSlider').value = 0;
+            updatePan(0);
+            sendPan(0);
+        }
+        
+        function updateTilt(value) {
+            document.getElementById('tiltValue').textContent = value;
+        }
+        
+        function sendTilt(value) {
+            apiPost('/api/head/tilt', { position: parseInt(value) })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log(`Tilt set to ${result.head_tilt}`, 'success');
+                    }
+                })
+                .catch(() => {});
+        }
+        
+        function centerTilt() {
+            document.getElementById('tiltSlider').value = 0;
+            updateTilt(0);
+            sendTilt(0);
+        }
+        
+        // ============== Waist Control ==============
+        function updateWaist(value) {
+            document.getElementById('waistValue').textContent = value;
+        }
+        
+        function sendWaist(value) {
+            apiPost('/api/waist', { position: parseInt(value) })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log(`Waist set to ${result.waist}`, 'success');
+                    }
+                })
+                .catch(() => {});
+        }
+        
+        function centerWaist() {
+            document.getElementById('waistSlider').value = 0;
+            updateWaist(0);
+            sendWaist(0);
+        }
+        
+        // ============== Voice Control ==============
+        function speak(phraseIndex) {
+            apiPost('/api/speak', { phrase_index: phraseIndex })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log(`Speaking: "${result.text}"`, 'success');
+                    }
+                })
+                .catch(() => {});
+        }
+        
+        // ============== Emergency Stop ==============
+        function emergencyStop() {
+            log('EMERGENCY STOP triggered!', 'error');
+            
+            // Reset joystick state
+            currentJoyX = 0;
+            currentJoyY = 0;
+            
+            // Reset UI
+            document.getElementById('leftSpeed').textContent = '0';
+            document.getElementById('rightSpeed').textContent = '0';
+            document.getElementById('direction').textContent = 'C';
+            document.getElementById('speedVal').textContent = '0%';
+            
+            // Send stop command
+            apiPost('/api/stop', {})
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log('Robot stopped successfully', 'success');
+                    }
+                })
+                .catch(() => {
+                    log('Stop command may have failed!', 'error');
+                });
+        }
+        
+        // ============== Page Lifecycle ==============
+        
+        // Handle page refresh/close - send stop command
+        window.addEventListener('beforeunload', function(e) {
+            // Try to stop robot before page unloads
+            // Use Blob with correct content-type for JSON
+            const blob = new Blob([JSON.stringify({})], { type: 'application/json' });
+            navigator.sendBeacon('/api/stop', blob);
+        });
+        
+        // Handle page visibility change (tab switch, minimize)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Page hidden - stop robot for safety
+                emergencyStop();
+            }
+        });
+        
+        // ============== Initialization ==============
+        window.onload = function() {
+            log('Robot Control Interface loaded');
+            
+            // Start heartbeat
+            startHeartbeat();
+            
+            // Start drive loop
+            startDriveLoop();
+            
+            // Initial connection check
+            apiPost('/api/heartbeat', {})
+                .then(() => log('Connected to robot server', 'success'))
+                .catch(() => log('Failed to connect to robot server', 'error'));
+        };
+    </script>
+</body>
+</html>
