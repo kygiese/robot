@@ -1,4 +1,4 @@
-import maestro
+from controllers import maestro
 from time import sleep
 
 LEFT_WHEEL = 0
