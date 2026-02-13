@@ -96,7 +96,8 @@ class Wheel:
             time: Duration in seconds
             speed: Speed value (typically 1000)
         """
-        self.move(speed, speed)
+        # Backward is the reverse of forward: reverse both wheel vectors
+        self.move(speed, -speed)
         sleep(time)
         self.stop()
 
@@ -106,10 +107,11 @@ class Wheel:
         
         Args:
             time: Duration in seconds
-            speed: Speed value (ignored in current implementation)
+            speed: Speed value for turn rate
         """
-        self.motor.setTarget(LEFT_WHEEL, 5000)
-        self.motor.setTarget(RIGHT_WHEEL, 5000)
+        # Turn left: both wheels move forward at same rate
+        turn_offset = -1000  # Fixed offset for turning
+        self.move(turn_offset, turn_offset)
         sleep(time)
         self.stop()
 
@@ -119,10 +121,11 @@ class Wheel:
         
         Args:
             time: Duration in seconds
-            speed: Speed value (ignored in current implementation)
+            speed: Speed value for turn rate
         """
-        self.motor.setTarget(LEFT_WHEEL, 7000)
-        self.motor.setTarget(RIGHT_WHEEL, 7000)
+        # Turn right: both wheels move backward at same rate
+        turn_offset = 1000  # Fixed offset for turning
+        self.move(turn_offset, turn_offset)
         sleep(time)
         self.stop()
 

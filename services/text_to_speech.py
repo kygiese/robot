@@ -95,7 +95,7 @@ class TextToSpeech:
             if self._tts_engine == "espeak":
                 # espeak command with speed parameter
                 subprocess.run(
-                    ["espeak", text, "-s", str(speed)],
+                    ["espeak", "-s", str(speed), text],
                     timeout=self.timeout,
                     capture_output=True
                 )
