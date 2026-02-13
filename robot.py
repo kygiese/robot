@@ -20,6 +20,7 @@ class Robot:
     def fullBodyTest(self):
         #movement
         self.wheels.forward(2, 1000)
+        sleep(0.5)
         self.wheels.backward(2, 1000)
         self.wheels.turn_left(2, 1000)
         self.wheels.turn_right(2, 1000)
@@ -40,7 +41,7 @@ class Robot:
         self.waist.turn(4000)
         sleep(1)
         self.waist.turn(8000)
-        sleep(1)
+        sleep(2)
         self.waist.center()
         sleep(1)
 
