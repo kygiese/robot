@@ -26,9 +26,9 @@ SERVO_CENTER = 6000
 
 # Try to import component modules
 try:
-    import wheel
-    import head
-    import waist
+    from robot_parts import wheel
+    from robot_parts import head
+    from robot_parts import waist
     MOCK_MODE = False
 except (ImportError, Exception):
     MOCK_MODE = True
@@ -404,20 +404,6 @@ class RobotControl:
                 component.controller.close()
             elif hasattr(component, 'motor') and hasattr(component.motor, 'close'):
                 component.motor.close()
-
-
-# Predefined phrases for voice output
-PHRASES = [
-    "Maybe Sisyphus wasn't happy.",
-    "My favorite food is enriched uranium.",
-    "Please do not touch my wheels.",
-    "Bread before toasters."
-]
-
-
-def get_phrases():
-    """Get list of available phrases for voice output"""
-    return PHRASES
 
 
 # Singleton instance for easy access

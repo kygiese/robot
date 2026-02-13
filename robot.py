@@ -1,9 +1,9 @@
 from time import sleep
 
-import wheel
-import arm
-import head
-import waist
+from robot_parts import wheel
+from robot_parts import arm
+from robot_parts import head
+from robot_parts import waist
 
 MAX = 8000
 MIN = 4000
