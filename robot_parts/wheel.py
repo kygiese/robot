@@ -104,13 +104,15 @@ class Wheel:
     def turn_left(self, time, speed):
         """
         Turn left for a specified duration.
+        Creates an arc by moving both wheels in the same direction.
         
         Args:
             time: Duration in seconds
-            speed: Speed value for turn rate
+            speed: Speed value (not used, kept for backward compatibility)
         """
-        # Turn left: both wheels move forward at same rate
-        turn_offset = -1000  # Fixed offset for turning
+        # Original behavior: both wheels to 5000 (CENTER-1000)
+        # This creates an arc, not a turn-in-place
+        turn_offset = -1000
         self.move(turn_offset, turn_offset)
         sleep(time)
         self.stop()
@@ -118,13 +120,15 @@ class Wheel:
     def turn_right(self, time, speed):
         """
         Turn right for a specified duration.
+        Creates an arc by moving both wheels in the same direction.
         
         Args:
             time: Duration in seconds
-            speed: Speed value for turn rate
+            speed: Speed value (not used, kept for backward compatibility)
         """
-        # Turn right: both wheels move backward at same rate
-        turn_offset = 1000  # Fixed offset for turning
+        # Original behavior: both wheels to 7000 (CENTER+1000)
+        # This creates an arc, not a turn-in-place
+        turn_offset = 1000
         self.move(turn_offset, turn_offset)
         sleep(time)
         self.stop()
