@@ -264,3 +264,85 @@ body {
         .debug-entry.success {
             color: #88ff88;
         }
+/* ---- Dialog Engine ---- */
+.dialog-status {
+    font-size: 0.85em;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+
+.dialog-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.dialog-history {
+    background: #0f0f1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 120px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.dialog-msg {
+    margin: 4px 0;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.dialog-msg.user {
+    background: #1a3a5c;
+    color: #88ccff;
+    text-align: right;
+}
+
+.dialog-msg.robot {
+    background: #163a24;
+    color: #88ffaa;
+}
+
+.dialog-msg.system {
+    color: #aaa;
+    font-style: italic;
+    font-size: 0.82em;
+}
+
+.dialog-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.dialog-input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #16213e;
+    color: #eee;
+    font-size: 1em;
+}
+
+.dialog-input:focus {
+    outline: none;
+    border-color: #00ff88;
+}
+
+.dialog-send-btn {
+    padding: 8px 18px;
+    background: #00ff88;
+    color: #111;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.dialog-send-btn:hover {
+    background: #00cc66;
+}

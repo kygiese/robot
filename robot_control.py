@@ -29,6 +29,7 @@ try:
     import wheel
     import head
     import waist
+    import arm
     MOCK_MODE = False
 except (ImportError, Exception):
     MOCK_MODE = True
@@ -75,6 +76,18 @@ class MockWaist:
         
     def turn(self, target):
         self.target = target
+
+
+class MockArm:
+    """Mock arm controller for testing without hardware"""
+    def __init__(self, min_val, max_val):
+        self.shoulder_target = SERVO_CENTER
+
+    def raiseRight(self, target):
+        self.shoulder_target = target
+
+    def lowerRight(self, target):
+        self.shoulder_target = target
 
 
 class RobotControl:
@@ -127,11 +140,13 @@ class RobotControl:
                 self._wheels = MockWheel(SERVO_MIN, SERVO_MAX)
                 self._head = MockHead(SERVO_MIN, SERVO_MAX)
                 self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
+                self._arm_component = MockArm(SERVO_MIN, SERVO_MAX)
             else:
                 # Use real hardware components
                 self._wheels = wheel.Wheel(SERVO_MIN, SERVO_MAX)
                 self._head = head.Head(SERVO_MIN, SERVO_MAX)
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
+                self._arm_component = arm.Arm(SERVO_MIN, SERVO_MAX)
             
             # Set to neutral/center position
             self.stop()
@@ -143,6 +158,7 @@ class RobotControl:
             self._wheels = MockWheel(SERVO_MIN, SERVO_MAX)
             self._head = MockHead(SERVO_MIN, SERVO_MAX)
             self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
+            self._arm_component = MockArm(SERVO_MIN, SERVO_MAX)
     
     def _start_safety_monitor(self):
         """Start the safety monitoring thread"""
@@ -377,6 +393,34 @@ class RobotControl:
         """Alias for waist_rotate for backward compatibility"""
         return self.waist_rotate(position)
     
+    def raise_arm(self):
+        """
+        Raise the right shoulder servo to a clearly visible pose,
+        hold briefly, then return to neutral.
+        Used by the <raise> dialog action tag.
+        """
+        # R_SHOULDER_Y is channel 5 in arm.py; raise = MAX, neutral = CENTER
+        raise_target = SERVO_MAX
+        neutral_target = SERVO_CENTER
+
+        with self._lock:
+            self._last_command_time = time.time()
+            if hasattr(self._arm_component, 'controller'):
+                self._arm_component.controller.setTarget(5, raise_target)
+            elif hasattr(self._arm_component, 'raiseRight'):
+                self._arm_component.raiseRight(raise_target)
+
+        time.sleep(1.0)
+
+        with self._lock:
+            self._last_command_time = time.time()
+            if hasattr(self._arm_component, 'controller'):
+                self._arm_component.controller.setTarget(5, neutral_target)
+            elif hasattr(self._arm_component, 'lowerRight'):
+                self._arm_component.lowerRight(neutral_target)
+
+        return {"status": "ok", "action": "raise_arm"}
+    
     def get_state(self):
         """
         Get current robot state.
@@ -399,7 +443,7 @@ class RobotControl:
         self._running = False
         self.stop()
         # Close component controllers if they have close methods
-        for component in [self._wheels, self._head, self._waist_component]:
+        for component in [self._wheels, self._head, self._waist_component, self._arm_component]:
             if hasattr(component, 'controller') and hasattr(component.controller, 'close'):
                 component.controller.close()
             elif hasattr(component, 'motor') and hasattr(component.motor, 'close'):

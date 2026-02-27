@@ -108,6 +108,23 @@
             </div>
         </div>
         
+        <!-- Dialog Engine Section -->
+        <div class="section">
+            <h2>Dialog Engine</h2>
+            <div id="dialogStatus" class="dialog-status">State: Loading...</div>
+            <div class="dialog-controls">
+                <button class="center-btn" onclick="resetDialog()">Reset Conversation</button>
+                <button class="center-btn" onclick="loadDefaultScript()">Reload Script</button>
+            </div>
+            <div class="dialog-history" id="dialogHistory"></div>
+            <div class="dialog-input-row">
+                <input type="text" id="dialogInput" class="dialog-input"
+                       placeholder="Type your message and press Enter or Send..."
+                       onkeydown="if(event.key==='Enter') sendDialogInput()">
+                <button class="dialog-send-btn" onclick="sendDialogInput()">Send</button>
+            </div>
+        </div>
+        
         <!-- Debug Panel -->
         <div class="section">
             <h2>Debug Log</h2>
@@ -337,6 +354,89 @@
                 });
         }
         
+        // ============== Dialog Engine ==============
+        function appendDialogMsg(text, role) {
+            const history = document.getElementById('dialogHistory');
+            const div = document.createElement('div');
+            div.className = 'dialog-msg ' + role;
+            if (role === 'user') {
+                div.textContent = 'You: ' + text;
+            } else if (role === 'robot') {
+                div.textContent = 'Robot: ' + text;
+            } else {
+                div.textContent = text;
+            }
+            history.appendChild(div);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function updateDialogStatus(state, ruleCount) {
+            const el = document.getElementById('dialogStatus');
+            let text = 'State: ' + state;
+            if (ruleCount !== undefined) text += ' | Rules: ' + ruleCount;
+            el.textContent = text;
+        }
+
+        async function sendDialogInput() {
+            const input = document.getElementById('dialogInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            appendDialogMsg(text, 'user');
+
+            try {
+                const result = await apiPost('/api/dialog/input', { text: text });
+                if (result.status === 'ok' || result.response) {
+                    appendDialogMsg(result.response || '(no response)', 'robot');
+                    if (result.action_tags && result.action_tags.length > 0) {
+                        appendDialogMsg('Actions: ' + result.action_tags.join(' '), 'system');
+                    }
+                    updateDialogStatus(result.state || '');
+                } else {
+                    appendDialogMsg('Error: ' + (result.message || 'unknown'), 'system');
+                }
+            } catch (e) {
+                appendDialogMsg('Connection error', 'system');
+            }
+        }
+
+        async function resetDialog() {
+            try {
+                const result = await apiPost('/api/dialog/reset', {});
+                appendDialogMsg('Conversation reset.', 'system');
+                updateDialogStatus(result.state || 'RUNNING');
+            } catch (e) {
+                log('Dialog reset failed', 'error');
+            }
+        }
+
+        async function loadDefaultScript() {
+            try {
+                const result = await apiPost('/api/dialog/load', { filename: 'sample_script.txt' });
+                if (result.status === 'ok') {
+                    appendDialogMsg('Script loaded (' + result.rule_count + ' rules).', 'system');
+                    if (result.errors && result.errors.length > 0) {
+                        result.errors.forEach(e => appendDialogMsg('Parse: ' + e, 'system'));
+                    }
+                } else {
+                    appendDialogMsg('Load failed: ' + (result.errors || []).join('; '), 'system');
+                }
+            } catch (e) {
+                log('Script load failed', 'error');
+            }
+        }
+
+        async function fetchDialogStatus() {
+            try {
+                const result = await fetch(API_BASE + '/api/dialog/status');
+                const data = await result.json();
+                updateDialogStatus(data.state, data.rule_count);
+            } catch (e) {
+                // ignore
+            }
+        }
+        
         // ============== Page Lifecycle ==============
         
         // Handle page refresh/close - send stop command
@@ -369,6 +469,9 @@
             apiPost('/api/heartbeat', {})
                 .then(() => log('Connected to robot server', 'success'))
                 .catch(() => log('Failed to connect to robot server', 'error'));
+
+            // Load dialog engine status
+            fetchDialogStatus();
         };
     </script>
 </body>

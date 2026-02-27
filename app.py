@@ -17,12 +17,20 @@ import robot_control
 import time
 import subprocess
 import threading
+import os
+import dialog_engine as de
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for local network access
 
 # Initialize robot control (will use mock mode if hardware not available)
 robot = None
+
+# Dialog engine singleton
+_dialog_engine = None
+
+# Default script path (relative to this file)
+DEFAULT_SCRIPT = os.path.join(os.path.dirname(__file__), "sample_script.txt")
 
 # Rate limiting for command flooding prevention
 last_command_times = {}
@@ -282,6 +290,127 @@ def api_phrases():
     return jsonify({"phrases": robot_control.get_phrases()})
 
 
+# ============== Dialog Engine API ==============
+
+def get_dialog_engine():
+    """Get or create the dialog engine singleton."""
+    global _dialog_engine
+    if _dialog_engine is None:
+        _dialog_engine = de.DialogEngine(robot_control=get_robot())
+        if os.path.isfile(DEFAULT_SCRIPT):
+            _dialog_engine.load(DEFAULT_SCRIPT)
+    return _dialog_engine
+
+
+@app.route("/api/dialog/input", methods=["POST"])
+def api_dialog_input():
+    """
+    Send user text input to the dialog engine.
+
+    Request body:
+        {"text": "user input string"}  (max 500 characters; longer inputs are truncated)
+
+    Response:
+        {"response": "robot reply", "action_tags": [...], "matched": bool, "state": "..."}
+    """
+    try:
+        data = request.get_json()
+        if not data or "text" not in data:
+            return jsonify({"status": "error", "message": "text field required"}), 400
+
+        user_text = str(data["text"])[:500]  # cap length for safety
+        engine = get_dialog_engine()
+        result = engine.process_input(user_text)
+
+        # Speak the response text asynchronously
+        response_text = result.get("response", "")
+        if response_text:
+            def speak_async(text):
+                try:
+                    subprocess.run(
+                        ["espeak", text, "-s", "130"],
+                        timeout=15, capture_output=True
+                    )
+                except FileNotFoundError:
+                    try:
+                        subprocess.run(["say", text], timeout=15, capture_output=True)
+                    except FileNotFoundError:
+                        print(f"Dialog TTS (no TTS): {text}")
+                except Exception as e:
+                    print(f"Dialog TTS error: {e}")
+
+            threading.Thread(target=speak_async, args=(response_text,), daemon=True).start()
+
+        result["status"] = "ok"
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route("/api/dialog/status", methods=["GET"])
+def api_dialog_status():
+    """Get current dialog engine status."""
+    try:
+        engine = get_dialog_engine()
+        return jsonify({"status": "ok", **engine.get_status()})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route("/api/dialog/load", methods=["POST"])
+def api_dialog_load():
+    """
+    Load a TangoChat script file into the dialog engine.
+
+    Request body:
+        {"filename": "path/to/script.txt"}
+    """
+    try:
+        data = request.get_json()
+        if not data or "filename" not in data:
+            return jsonify({"status": "error", "message": "filename required"}), 400
+
+        filename = str(data["filename"])
+        # Restrict to files under the app directory for safety
+        app_dir = os.path.dirname(os.path.abspath(__file__))
+        abs_path = os.path.abspath(os.path.join(app_dir, filename))
+        if not abs_path.startswith(app_dir):
+            return jsonify({"status": "error", "message": "Access denied"}), 403
+
+        engine = get_dialog_engine()
+        success = engine.load(abs_path)
+
+        errors = [str(e) for e in engine.parse_errors]
+        if success:
+            return jsonify({
+                "status": "ok",
+                "loaded": True,
+                "rule_count": len(engine.top_rules),
+                "errors": errors
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "loaded": False,
+                "errors": errors
+            }), 400
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route("/api/dialog/reset", methods=["POST"])
+def api_dialog_reset():
+    """Reset dialog engine conversation state (variables, scope)."""
+    try:
+        engine = get_dialog_engine()
+        engine.reset()
+        return jsonify({"status": "ok", "state": engine.state.value})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 # ============== Error Handlers ==============
 
 @app.errorhandler(404)
@@ -314,6 +443,9 @@ if __name__ == "__main__":
     
     # Initialize robot before starting server
     get_robot()
+    
+    # Initialize dialog engine with default script
+    get_dialog_engine()
     
     # Run Flask server
     # host='0.0.0.0' allows access from other devices on the network
