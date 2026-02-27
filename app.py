@@ -15,7 +15,11 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import robot_control
 import time
+import os
+import threading
 from services.text_to_speech import TextToSpeech, get_default_phrases
+from services.DialogEngine import DialogEngine
+from ActionRunner import ActionRunner
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for local network access
@@ -25,6 +29,14 @@ robot = None
 
 # Initialize text-to-speech service
 tts = TextToSpeech()
+
+# Dialog engine and action runner (initialized lazily)
+_dialog_engine = None
+_action_runner = None
+_dialog_lock = threading.Lock()
+
+# Default script path (relative to app.py location)
+_DEFAULT_SCRIPT = os.path.join(os.path.dirname(__file__), "sample_script.bot")
 
 # Rate limiting for command flooding prevention
 last_command_times = {}
@@ -268,6 +280,110 @@ def api_speak():
 def api_phrases():
     """Get list of available phrases"""
     return jsonify({"phrases": get_default_phrases()})
+
+
+def get_dialog_engine(script_path=None):
+    """Get or initialize the dialog engine singleton."""
+    global _dialog_engine, _action_runner
+    with _dialog_lock:
+        if _dialog_engine is None or script_path is not None:
+            engine = DialogEngine()
+            path = script_path or _DEFAULT_SCRIPT
+            if engine.load_script(path):
+                _dialog_engine = engine
+                _action_runner = ActionRunner(get_robot())
+            else:
+                return None, None
+        return _dialog_engine, _action_runner
+
+
+# ============== Dialog API ==============
+
+@app.route("/api/dialog", methods=["POST"])
+def api_dialog():
+    """
+    Dialog endpoint — accepts typed user input, processes it through the
+    dialog engine, speaks the response, and triggers robot actions.
+
+    Request body:
+        {"text": "user input string"}
+        {"text": "...", "script": "/path/to/script.bot"}  # optional reload
+
+    Response:
+        {"status": "ok", "response": "robot reply", "actions": [...]}
+        {"status": "no_match", "response": null}
+    """
+    try:
+        data = request.get_json()
+        if not data or "text" not in data:
+            return jsonify({"status": "error", "message": "text field required"}), 400
+
+        user_text = str(data["text"]).strip()
+        if not user_text:
+            return jsonify({"status": "error", "message": "text must not be empty"}), 400
+
+        script_path = data.get("script")
+        engine, runner = get_dialog_engine(script_path)
+        if engine is None:
+            return jsonify({"status": "error",
+                            "message": "Dialog engine failed to load script"}), 500
+
+        response, actions = engine.process_input(user_text)
+
+        if response is None:
+            return jsonify({"status": "no_match", "response": None, "actions": []})
+
+        # Speak the response asynchronously
+        tts.speak(response, async_mode=True)
+
+        # Run actions in a background thread so the HTTP response returns quickly
+        if actions and runner:
+            def _run_actions():
+                for act in actions:
+                    runner.run_action(act)
+            threading.Thread(target=_run_actions, daemon=True).start()
+
+        return jsonify({
+            "status": "ok",
+            "response": response,
+            "actions": actions,
+        })
+
+    except Exception as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 500
+
+
+@app.route("/api/dialog/reset", methods=["POST"])
+def api_dialog_reset():
+    """Reset dialog engine conversational state (variables and scope)."""
+    try:
+        engine, _ = get_dialog_engine()
+        if engine:
+            engine.reset()
+        return jsonify({"status": "ok"})
+    except Exception as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 500
+
+
+@app.route("/api/dialog/load", methods=["POST"])
+def api_dialog_load():
+    """
+    (Re)load a dialog script.
+
+    Request body:
+        {"script": "/path/to/script.bot"}
+    """
+    try:
+        data = request.get_json()
+        if not data or "script" not in data:
+            return jsonify({"status": "error", "message": "script field required"}), 400
+
+        engine, _ = get_dialog_engine(str(data["script"]))
+        if engine is None:
+            return jsonify({"status": "error", "message": "Failed to load script"}), 500
+        return jsonify({"status": "ok"})
+    except Exception as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 500
 
 
 # ============== Error Handlers ==============
