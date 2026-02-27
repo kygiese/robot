@@ -1,0 +1,115 @@
+# ============================================================
+# sample_script.txt  --  TangoChat-style dialog script
+# CSCI 455 Robotics Studio - Project 2 test script
+# ============================================================
+
+# ---- Definitions ----
+~greet:       [hello hi hey howdy "good morning" "good afternoon"]
+~affirm:      [yes yeah sure yep ok okay]
+~deny:        [no nope nah "no way"]
+~thanks:      [thanks "thank you" "many thanks"]
+~bye:         [bye goodbye "see you" "see ya" later]
+~arm_words:   ["raise your arm" wave "show me your arm"]
+~dance_words: ["do a dance" dance "spin around"]
+~whoami:      ["what is my name" "do you remember my name" "who am i"]
+~howold:      ["how old am i" "what is my age"]
+
+# -----------------------------
+# Global safety / control words
+# These trigger the safety interrupt in the engine.
+# -----------------------------
+u:([stop cancel reset quit]): OK. Stopping now.
+
+# -----------------------------
+# Greeting with output choice list + action tag
+# -----------------------------
+u:(~greet): [hi hello "what up" sup] <nod>
+
+# Scope test: after greeting, u1 rules become active
+u1:(~affirm): Great! <nod>
+u1:(~deny): No worries. <shake>
+# Quoted phrase match test
+u1:("hi there"): Hey, you said the special greeting. <nod>
+# Multiple actions in one output
+u1:(you are awesome): Thanks! <nod> <raise>
+# Deliberate spacing weirdness
+u1: ( and ) : and-and-and! <nod>
+
+# -----------------------------
+# Variable capture and recall
+# -----------------------------
+u:(my name is _): Nice to meet you, $name. <nod>
+u:(i am _ years old): Got it. You are $age years old. <nod>
+
+# Recall variables
+u:(~whoami): Your name is $name.
+u:(~howold): You are $age years old.
+
+# If the variable was never set, engine speaks "I don't know"
+u:(what is my favorite color): Your favorite color is $color.
+
+# -----------------------------
+# Required movement triggers as direct commands
+# -----------------------------
+u:(~affirm): [nice okay] <nod>
+u:(~deny): [okay got it] <shake>
+u:(~arm_words): [ok sure] <raise>
+u:(~dance_words): [party time "here we go"] <dance>
+
+# -----------------------------
+# Mixed text + action + output choice list
+# -----------------------------
+u:(tell me something cool): [Robots are fun "CS is magic" "I like snacks"]
+
+# Unknown action tag: engine must log warning and ignore
+u:(do the secret move): Absolutely. <secret_move>
+
+# -----------------------------
+# Nested scope depth test (u -> u1 -> u2)
+# -----------------------------
+u:(let us talk): Sure. Ask me a question.
+    u1:(are you happy): [yes "mostly yes"] <nod>
+    u1:(are you sad): [no "not today"] <shake>
+        # This u2 only becomes active after u1:(are you sad) matches
+        u2:(why): Because I am a robot. <shake>
+    u1:(do you like homework): [no nope] <shake>
+
+# -----------------------------
+# Definition usage inside output
+# (Engine expands ~greet inside output to a random choice)
+# -----------------------------
+u:(say hello): ~greet <nod>
+
+# -----------------------------
+# Bracket choices inside pattern with quoted phrase
+# -----------------------------
+u:([robot "cool robot" friend]): I heard you. <nod>
+
+# -----------------------------
+# Thanks and goodbye
+# -----------------------------
+u:(~thanks): You are welcome. <nod>
+u:(~bye): Goodbye! <shake>
+
+# ============================================================
+# Deliberate syntax errors (engine must report and skip)
+# ============================================================
+# Missing second colon delimiter (non-fatal: skip and continue)
+u:(this is an error) error here
+# Unbalanced brackets in output (non-fatal)
+u:(bad bracket): [one two three
+# Bad definition line, missing colon (non-fatal)
+~broken_definition [a b c]
+
+# ============================================================
+# Max nesting depth stress test
+# Engine enforces MAX_SCOPE_LEVEL = 6; u7 should never activate.
+# ============================================================
+u:(deep test): entering depth 1
+u1:(go deeper): depth 2
+u2:(go deeper): depth 3
+u3:(go deeper): depth 4
+u4:(go deeper): depth 5
+u5:(go deeper): depth 6
+u6:(go deeper): depth 7 SHOULD NOT ACTIVATE
+u7:(go deeper): depth 8 REALLY SHOULD NOT ACTIVATE
