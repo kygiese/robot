@@ -1,4 +1,4 @@
-import maestro
+from controllers import maestro
 from time import sleep
 
 LEFT_WHEEL = 0
@@ -42,12 +42,12 @@ def main():
     controller.setTarget(RIGHT_WHEEL, CENTER)
     sleep(WAIT)
     #turn
-    controller.setTarget(LEFT_WHEEL, 4000)
-    controller.setTarget(RIGHT_WHEEL, 4000)
+    controller.setTarget(LEFT_WHEEL, 5000)
+    controller.setTarget(RIGHT_WHEEL, 5000)
     sleep(2)
     controller.setTarget(LEFT_WHEEL, CENTER)
     controller.setTarget(RIGHT_WHEEL, CENTER)
-    sleep(6)
+    sleep(WAIT)
 
     #waist
     controller.setSpeed(WAIST, 30)
@@ -71,4 +71,6 @@ def main():
     sleep(WAIT)
     controller.setTarget(HEAD_PAN, CENTER)
     sleep(WAIT)
+ 
 
+main()

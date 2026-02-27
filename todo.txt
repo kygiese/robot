@@ -9,4 +9,6 @@
 - goal: full control running locally
 - stretch: full control locally + connect to app
 
+PROJECT 2
+2/20
 

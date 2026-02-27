@@ -17,6 +17,15 @@
                 <div class="status-dot" id="statusDot"></div>
                 <span id="statusText">Connecting...</span>
             </div>
+            <div class="control-mode">
+                <label class="switch-label">
+                    <span id="modeLabel">Standard Mode</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="activeModeToggle" onchange="toggleControlMode()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </label>
+            </div>
             <button class="stop-btn" id="stopBtn" onclick="emergencyStop()">⚠️ STOP</button>
         </div>
         
@@ -120,14 +129,19 @@
         const API_BASE = '';  // Same origin
         const HEARTBEAT_INTERVAL = 1000;  // 1 second
         const DRIVE_SEND_INTERVAL = 100;  // 100ms between drive commands
+        const SLIDER_THROTTLE_INTERVAL = 50;  // 50ms throttle for active mode sliders
         
         // ============== State Variables ==============
         let isConnected = false;
         let lastDriveSent = 0;
+        let lastPanSent = 0;
+        let lastTiltSent = 0;
+        let lastWaistSent = 0;
         let currentJoyX = 0;
         let currentJoyY = 0;
         let heartbeatInterval = null;
         let driveInterval = null;
+        let activeMode = false;  // Control mode: false=standard, true=active response
         
         // ============== Debug Logging ==============
         function log(message, type = 'info') {
@@ -238,16 +252,40 @@
             sendDriveCommand();
         });
         
+        // ============== Control Mode ==============
+        function toggleControlMode() {
+            activeMode = document.getElementById('activeModeToggle').checked;
+            const modeLabel = document.getElementById('modeLabel');
+            
+            if (activeMode) {
+                modeLabel.textContent = 'Active Response';
+                log('Active Response Mode: Controls respond in real-time', 'success');
+            } else {
+                modeLabel.textContent = 'Standard Mode';
+                log('Standard Mode: Controls respond when released', 'success');
+            }
+        }
+        
         // ============== Head Control ==============
         function updatePan(value) {
             document.getElementById('panValue').textContent = value;
+            // In active mode, send command immediately while moving (with throttling)
+            if (activeMode) {
+                const now = Date.now();
+                if (now - lastPanSent >= SLIDER_THROTTLE_INTERVAL) {
+                    lastPanSent = now;
+                    sendPan(value);
+                }
+            }
         }
         
         function sendPan(value) {
             apiPost('/api/head/pan', { position: parseInt(value) })
                 .then(result => {
                     if (result.status === 'ok') {
-                        log(`Pan set to ${result.head_pan}`, 'success');
+                        if (!activeMode) {
+                            log(`Pan set to ${result.head_pan}`, 'success');
+                        }
                     }
                 })
                 .catch(() => {});
@@ -261,13 +299,23 @@
         
         function updateTilt(value) {
             document.getElementById('tiltValue').textContent = value;
+            // In active mode, send command immediately while moving (with throttling)
+            if (activeMode) {
+                const now = Date.now();
+                if (now - lastTiltSent >= SLIDER_THROTTLE_INTERVAL) {
+                    lastTiltSent = now;
+                    sendTilt(value);
+                }
+            }
         }
         
         function sendTilt(value) {
             apiPost('/api/head/tilt', { position: parseInt(value) })
                 .then(result => {
                     if (result.status === 'ok') {
-                        log(`Tilt set to ${result.head_tilt}`, 'success');
+                        if (!activeMode) {
+                            log(`Tilt set to ${result.head_tilt}`, 'success');
+                        }
                     }
                 })
                 .catch(() => {});
@@ -282,13 +330,23 @@
         // ============== Waist Control ==============
         function updateWaist(value) {
             document.getElementById('waistValue').textContent = value;
+            // In active mode, send command immediately while moving (with throttling)
+            if (activeMode) {
+                const now = Date.now();
+                if (now - lastWaistSent >= SLIDER_THROTTLE_INTERVAL) {
+                    lastWaistSent = now;
+                    sendWaist(value);
+                }
+            }
         }
         
         function sendWaist(value) {
             apiPost('/api/waist', { position: parseInt(value) })
                 .then(result => {
                     if (result.status === 'ok') {
-                        log(`Waist set to ${result.waist}`, 'success');
+                        if (!activeMode) {
+                            log(`Waist set to ${result.waist}`, 'success');
+                        }
                     }
                 })
                 .catch(() => {});

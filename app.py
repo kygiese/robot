@@ -15,14 +15,16 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import robot_control
 import time
-import subprocess
-import threading
+from services.text_to_speech import TextToSpeech, get_default_phrases
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for local network access
 
 # Initialize robot control (will use mock mode if hardware not available)
 robot = None
+
+# Initialize text-to-speech service
+tts = TextToSpeech()
 
 # Rate limiting for command flooding prevention
 last_command_times = {}
@@ -229,7 +231,7 @@ def api_state():
 def api_speak():
     """
     Voice output endpoint.
-    Uses espeak or similar text-to-speech.
+    Uses the TextToSpeech service for espeak or similar text-to-speech.
     
     Request body:
         {"phrase_index": 0-3} or {"text": "custom text"}
@@ -239,7 +241,7 @@ def api_speak():
         if not data:
             return jsonify({"status": "error", "message": "No data provided"}), 400
         
-        phrases = robot_control.get_phrases()
+        phrases = get_default_phrases()
         
         # Get phrase by index or custom text
         if "phrase_index" in data:
@@ -253,24 +255,10 @@ def api_speak():
         else:
             return jsonify({"status": "error", "message": "phrase_index or text required"}), 400
         
-        # Try to speak using espeak (common on Raspberry Pi)
-        def speak_async(text):
-            try:
-                subprocess.run(["espeak", text, " -s", "100"], timeout=10, capture_output=True)
-            except FileNotFoundError:
-                # espeak not installed, try alternative
-                try:
-                    subprocess.run(["say", text], timeout=10, capture_output=True)
-                except FileNotFoundError:
-                    print(f"Speech output (no TTS available): {text}")
-            except Exception as e:
-                print(f"Speech error: {e}")
+        # Use the text-to-speech service
+        result = tts.speak(text, async_mode=True)
         
-        # Run speech in background thread to not block
-        thread = threading.Thread(target=speak_async, args=(text,))
-        thread.start()
-        
-        return jsonify({"status": "ok", "text": text})
+        return jsonify(result)
     
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -279,7 +267,7 @@ def api_speak():
 @app.route("/api/phrases", methods=["GET"])
 def api_phrases():
     """Get list of available phrases"""
-    return jsonify({"phrases": robot_control.get_phrases()})
+    return jsonify({"phrases": get_default_phrases()})
 
 
 # ============== Error Handlers ==============
