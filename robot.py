@@ -45,7 +45,7 @@ class Robot:
         self.waist.center()
         sleep(1)
     
-    def   def move_waist(self, target):
+    def  move_waist(self, target):
         self.waist.turn(target)
 
     def tilt_head(self, target):

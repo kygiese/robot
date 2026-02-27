@@ -36,7 +36,7 @@ _action_runner = None
 _dialog_lock = threading.Lock()
 
 # Default script path (relative to app.py location)
-_DEFAULT_SCRIPT = os.path.join(os.path.dirname(__file__), "sample_script.bot")
+_DEFAULT_SCRIPT = os.path.join(os.path.dirname(__file__), "testDialogFileForPractice.txt")
 
 # Rate limiting for command flooding prevention
 last_command_times = {}
