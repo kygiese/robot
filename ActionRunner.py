@@ -37,10 +37,10 @@ class ActionRunner:
         """
         action = action.lower().strip()
         handler = {
-            "nod": self._nod,
-            "shake": self._shake,
-            "dance": self._dance,
-            "arm": self._arm,
+            "head_yes": self._nod,
+            "head_no": self._shake,
+            "dance90": self._dance,
+            "arm_raise": self._arm,
         }.get(action)
         if handler:
             try:
