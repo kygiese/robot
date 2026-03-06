@@ -59,19 +59,19 @@ class ActionRunner:
 
     def _nod(self):
         """Nod head: tilt down → tilt up → center."""
-        self.robot.head_tilt(-60)
+        self.robot.head_tilt(5000)
         time.sleep(_STEP_DELAY)
-        self.robot.head_tilt(60)
+        self.robot.head_tilt(7000)
         time.sleep(_STEP_DELAY)
-        self.robot.head_tilt(0)
+        self.robot.head_tilt(6000)
 
     def _shake(self):
         """Shake head: pan left → pan right → center."""
-        self.robot.head_pan(-60)
+        self.robot.head_pan(5000)
         time.sleep(_STEP_DELAY)
-        self.robot.head_pan(60)
+        self.robot.head_pan(7000)
         time.sleep(_STEP_DELAY)
-        self.robot.head_pan(0)
+        self.robot.head_pan(6000)
 
     def _dance(self):
         """
@@ -79,14 +79,14 @@ class ActionRunner:
         Wheels stay stopped (safe).
         """
         for _ in range(2):
-            self.robot.head_pan(-50)
-            self.robot.waist(-40)
+            self.robot.head_pan(5000)
+            self.robot.waist(5000)
             time.sleep(_STEP_DELAY)
-            self.robot.head_pan(50)
-            self.robot.waist(40)
+            self.robot.head_pan(7000)
+            self.robot.waist(7000)
             time.sleep(_STEP_DELAY)
-        self.robot.head_pan(0)
-        self.robot.waist(0)
+        self.robot.head_pan(6000)
+        self.robot.waist(6000)
 
     def _arm(self):
         """Placeholder for arm movement — extend when arm servos are wired."""
