@@ -53,6 +53,37 @@ class Arm:
         self.controller.setRange(L_WRIST_X, min_val, max_val)
         self.controller.setRange(L_CLAW, min_val, max_val)
 
+    def shoulder_y(self, target, side='both'):
+        """
+        Move shoulder Y (up/down) servo(s) to target position.
+
+        The maestro controller enforces per-channel ranges set in __init__,
+        so targets are clamped to each joint's safe limits automatically.
+
+        Args:
+            target: Servo target value (4000-8000)
+            side:   'left', 'right', or 'both'
+        """
+        target = max(self.min, min(self.max, target))
+        if side in ('right', 'both'):
+            self.controller.setTarget(R_SHOULDER_Y, target)
+        if side in ('left', 'both'):
+            self.controller.setTarget(L_SHOULDER_Y, target)
+
+    def center(self):
+        """
+        Return all arm servos to the center position (6000).
+
+        6000 falls within every joint's configured range, so this is
+        always a safe resting state.
+        """
+        center = 6000
+        for ch in (R_SHOULDER_X, R_SHOULDER_Y, R_ELBOW,
+                   R_WRIST_X, R_WRIST_Y, R_CLAW,
+                   L_SHOULDER_X, L_SHOULDER_Y, L_ELBOW,
+                   L_WRIST_X, L_WRIST_Y, L_CLAW):
+            self.controller.setTarget(ch, center)
+
     def moveTestAll(self):
         """
         Test all arm joints by moving them through their range.

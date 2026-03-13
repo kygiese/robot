@@ -89,5 +89,11 @@ class ActionRunner:
         self.robot.waist(6000)
 
     def _arm(self):
-        """Placeholder for arm movement — extend when arm servos are wired."""
-        pass
+        """Raise both arms: shoulders up → hold → shoulders down → center."""
+        self.robot.arm_raise(100)
+        time.sleep(1)
+        self.robot.arm_raise(0)
+        time.sleep(.5)
+        self.robot.arm_raise(-50)
+        time.sleep(.5)
+        self.robot.arm_raise(0)

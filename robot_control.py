@@ -5,11 +5,13 @@ This module provides a unified interface for controlling the robot's:
 - Wheels (driving forward/backward/turning)
 - Head (pan and tilt)
 - Waist (rotation)
+- Arms (shoulder raise/lower)
 
 Uses the hierarchical component structure from robot.py:
 - wheel.Wheel for wheel control
 - head.Head for head control
 - waist.Waist for waist control
+- arm.Arm for arm control
 
 All functions enforce safe limits and provide a STOP/neutral state.
 This layer is callable directly from Python for testing.
@@ -29,6 +31,7 @@ try:
     from robot_parts import wheel
     from robot_parts import head
     from robot_parts import waist
+    from robot_parts import arm
     MOCK_MODE = False
 except (ImportError, Exception):
     MOCK_MODE = True
@@ -77,6 +80,26 @@ class MockWaist:
         self.target = target
 
 
+class MockArm:
+    """Mock arm controller for testing without hardware"""
+    def __init__(self, min_val, max_val):
+        self.min = min_val
+        self.max = max_val
+        self.left_shoulder_y = SERVO_CENTER
+        self.right_shoulder_y = SERVO_CENTER
+
+    def shoulder_y(self, target, side='both'):
+        target = max(self.min, min(self.max, target))
+        if side in ('right', 'both'):
+            self.right_shoulder_y = target
+        if side in ('left', 'both'):
+            self.left_shoulder_y = target
+
+    def center(self):
+        self.left_shoulder_y = SERVO_CENTER
+        self.right_shoulder_y = SERVO_CENTER
+
+
 class RobotControl:
     """
     Main robot control class that provides safe, validated control
@@ -106,6 +129,7 @@ class RobotControl:
         self._head_pan_pos = 0  # -100 to 100
         self._head_tilt_pos = 0  # -100 to 100
         self._waist_pos = 0  # -100 to 100
+        self._arm_pos = 0  # -100 to 100 (shoulder Y for arm raise)
         
         # Heartbeat for connection monitoring
         self._last_command_time = time.time()
@@ -127,11 +151,13 @@ class RobotControl:
                 self._wheels = MockWheel(SERVO_MIN, SERVO_MAX)
                 self._head = MockHead(SERVO_MIN, SERVO_MAX)
                 self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
+                self._arm = MockArm(SERVO_MIN, SERVO_MAX)
             else:
                 # Use real hardware components
                 self._wheels = wheel.Wheel(SERVO_MIN, SERVO_MAX)
                 self._head = head.Head(SERVO_MIN, SERVO_MAX)
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
+                self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
             
             # Set to neutral/center position
             self.stop()
@@ -143,6 +169,7 @@ class RobotControl:
             self._wheels = MockWheel(SERVO_MIN, SERVO_MAX)
             self._head = MockHead(SERVO_MIN, SERVO_MAX)
             self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
+            self._arm = MockArm(SERVO_MIN, SERVO_MAX)
     
     def _start_safety_monitor(self):
         """Start the safety monitoring thread"""
@@ -241,6 +268,10 @@ class RobotControl:
             # Center waist using waist component
             self._waist_pos = 0
             self._waist_component.turn(SERVO_CENTER)
+            
+            # Center arms using arm component
+            self._arm_pos = 0
+            self._arm.center()
         
         return {"status": "ok", "message": "Robot stopped"}
     
@@ -372,6 +403,34 @@ class RobotControl:
             "waist": position
         }
     
+    def arm_raise(self, position, side='both'):
+        """
+        Control arm raise (shoulder Y movement).
+        Uses the arm component for control.  The arm component's per-joint
+        ranges (set in arm.Arm.__init__) are preserved; the maestro driver
+        clamps any target that falls outside a channel's configured range.
+
+        Args:
+            position: Shoulder position (-100 to 100, down to up)
+            side:     'left', 'right', or 'both'
+
+        Returns:
+            dict with status and actual value used
+        """
+        position = self._validate_position(position)
+
+        with self._lock:
+            self._last_command_time = time.time()
+            self._arm_pos = position
+            servo_value = self._position_to_servo(position)
+            self._arm.shoulder_y(servo_value, side=side)
+
+        return {
+            "status": "ok",
+            "arm_raise": position,
+            "side": side,
+        }
+
     # Backward compatibility alias
     def waist(self, position):
         """Alias for waist_rotate for backward compatibility"""
@@ -391,6 +450,7 @@ class RobotControl:
                 "head_pan": self._head_pan_pos,
                 "head_tilt": self._head_tilt_pos,
                 "waist": self._waist_pos,
+                "arm_raise": self._arm_pos,
                 "mock_mode": self._mock_mode
             }
     
@@ -399,7 +459,7 @@ class RobotControl:
         self._running = False
         self.stop()
         # Close component controllers if they have close methods
-        for component in [self._wheels, self._head, self._waist_component]:
+        for component in [self._wheels, self._head, self._waist_component, self._arm]:
             if hasattr(component, 'controller') and hasattr(component.controller, 'close'):
                 component.controller.close()
             elif hasattr(component, 'motor') and hasattr(component.motor, 'close'):
