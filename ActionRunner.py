@@ -52,6 +52,8 @@ class ActionRunner:
             finally:
                 # Deadman stop: always return to neutral after any action
                 self.robot.stop()
+        else:
+            print(f"ActionRunner: unknown action '{action}' — ignoring")
 
     # ------------------------------------------------------------------ #
     # Individual actions                                                   #
