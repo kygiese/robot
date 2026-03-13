@@ -164,7 +164,7 @@ class DialogEngine:
                     continue
 
                 # Guard: detect unbalanced brackets in output
-                if output_str.count("[") != output_str.count("]"):
+                if not self._brackets_balanced(output_str):
                     self._warn(line_num, "UNBALANCED_BRACKET",
                                f"Unbalanced brackets in output — skipping")
                     continue
@@ -196,6 +196,19 @@ class DialogEngine:
         err = ParseError(self.filename, line_num, category, message, fatal)
         self.errors.append(err)
         print(err)
+
+    @staticmethod
+    def _brackets_balanced(text):
+        """Return True if square brackets in *text* are properly nested."""
+        depth = 0
+        for ch in text:
+            if ch == "[":
+                depth += 1
+            elif ch == "]":
+                depth -= 1
+                if depth < 0:
+                    return False
+        return depth == 0
 
     # ------------------------------------------------------------------ #
     # Conversation processing                                              #
@@ -301,7 +314,9 @@ class DialogEngine:
                 # Quoted phrase — treat as a single literal token
                 j = s.find('"', i + 1)
                 if j == -1:
-                    j = len(s)
+                    # Unmatched quote — consume rest of string
+                    tokens.append(s[i + 1:])
+                    break
                 tokens.append(s[i + 1: j])
                 i = j + 1
             elif ch == "[":
