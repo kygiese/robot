@@ -72,7 +72,7 @@ class ActionRunner:
         self.robot.head_pan(5000)
         time.sleep(.5)
         self.robot.head_pan(7000)
-        time.sleep(.5)
+        time.sleep(1)
         self.robot.head_pan(6000)
 
     def _dance(self):
