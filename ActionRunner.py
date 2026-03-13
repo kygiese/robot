@@ -74,23 +74,13 @@ class ActionRunner:
         self.robot.head_pan(6000)
 
     def _dance(self):
-        """
-        Simple dance: alternate head pan with a bounded time.
-        Wheels stay stopped (safe).
-        """
-        for _ in range(2):
-            self.robot.head_pan(5000)
-            self.robot.waist(5000)
-            time.sleep(_STEP_DELAY)
-            self.robot.head_pan(7000)
-            self.robot.waist(7000)
-            time.sleep(_STEP_DELAY)
-        self.robot.head_pan(6000)
-        self.robot.waist(6000)
+        self.robot.wheels.turn_left(.5, 1000)
+        self.robot.wheels.turn_right(.5, 1000)
+
 
     def _arm(self):
         """Raise both arms: shoulders up → hold → shoulders down → center."""
         self.robot.arm_raise(7000)
         time.sleep(1)
         self.robot.arm_raise(6000)
-      
+
