@@ -69,16 +69,16 @@ class ActionRunner:
 
     def _shake(self):
         """Shake head: pan left → pan right → center."""
-        self.robot.head_pan(5000)
+        self.robot.head_pan(100)
         time.sleep(.5)
-        self.robot.head_pan(7000)
+        self.robot.head_pan(-100)
         time.sleep(1)
-        self.robot.head_pan(6000)
+        self.robot.head_pan(0)
 
     def _dance(self):
-        self.robot.drive(50,-50)
+        self.robot.drive(50,50)
         time.sleep(.7)
-        self.robot.drive(-50,50)
+        self.robot.drive(50,50)
         time.sleep(.7)
         self.robot.drive(0,0)
 
