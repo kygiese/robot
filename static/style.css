@@ -332,3 +332,79 @@ body {
         .debug-entry.success {
             color: #88ff88;
         }
+        /* Dialog Section */
+        .dialog-log {
+            background: #0a0a15;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .dialog-entry {
+            margin: 4px 0;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .dialog-user {
+            background: #0f3460;
+            color: #aaddff;
+            text-align: right;
+        }
+
+        .dialog-robot {
+            background: #163060;
+            color: #00ff88;
+        }
+
+        .dialog-nomatch {
+            color: #888;
+            font-style: italic;
+        }
+
+        .dialog-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .dialog-input {
+            flex: 1;
+            background: #0f3460;
+            color: #eee;
+            border: 1px solid #00ff88;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 1em;
+            outline: none;
+        }
+
+        .dialog-input::placeholder {
+            color: #556;
+        }
+
+        .dialog-input:focus {
+            border-color: #88ffcc;
+        }
+
+        .send-btn {
+            background: #00ff88;
+            color: #0f3460;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .send-btn:hover {
+            background: #88ffcc;
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }

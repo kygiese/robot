@@ -1,0 +1,44 @@
+# sample_script.bot
+# Sample TangoChat-style dialog script for the robot dialog engine.
+# Format: u:(pattern):output text <action_tag>
+#         u1:(sub-pattern):sub-output
+#             u2:(deeper-pattern):deeper-output
+
+# ----- Definitions -------------------------------------------------------
+~greeting: [hi hello hey "what's up" howdy]
+~farewell: [bye goodbye "see you" later]
+~name_question: ["what is your name" "who are you" "what are you called"]
+
+# ----- Top-level rules ---------------------------------------------------
+
+u: ([~greeting] *) : ["Hello!" "Hi there!" "Hey!"] <nod>
+    u1: (my name is _) : Nice to meet you $name I will remember that. <nod>
+        u2: (how are you) : I am doing great $name how about you
+        u2: (*) : Tell me more $name
+    u1: (what is your name) : I am a robot built by the CSCI 455 team. <nod>
+    u1: ([~farewell] *) : It was nice talking with you Goodbye <shake>
+
+u: (my name is _) : Hello $name it is good to meet you <nod>
+    u1: (how are you) : I am functioning well thank you $name
+    u1: ([~farewell] *) : Goodbye $name come back soon <shake>
+
+u: ([~name_question]) : My name is Robot. What is yours <nod>
+    u1: (my name is _) : Hello $name nice to meet you
+    u1: (i am _) : Hello $name glad you told me
+
+u: (how are you *) : I am doing well thank you for asking <nod>
+    u1: (i am [good great fine]) : Glad to hear it
+    u1: (i am [bad sad tired]) : I am sorry to hear that I hope you feel better
+    u1: (*) : I hope you are well too
+
+u: (what can you do *) : I can drive around pan my head and have a conversation <nod>
+    u1: (can you dance) : Sure let me try <dance>
+    u1: (can you [nod shake]) : Of course <nod>
+
+u: (dance *) : ["Let me show you my moves!" "Here goes!"] <dance>
+
+u: (stop *) : Stopping now <shake>
+
+u: ([~farewell] *) : Goodbye it was nice talking with you <shake>
+
+u: (*) : ["I am not sure I understand." "Could you rephrase that?" "Tell me more."]

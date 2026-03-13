@@ -117,6 +117,19 @@
             </div>
         </div>
         
+        <!-- Dialog Engine Section -->
+        <div class="section">
+            <h2>Dialog</h2>
+            <div class="dialog-log" id="dialogLog"></div>
+            <div class="dialog-input-row">
+                <input type="text" id="dialogInput" class="dialog-input"
+                       placeholder="Type your message and press Enter or Send…"
+                       onkeydown="if(event.key==='Enter') sendDialog()">
+                <button class="send-btn" onclick="sendDialog()">Send</button>
+                <button class="center-btn" onclick="resetDialog()" title="Reset conversation">Reset</button>
+            </div>
+        </div>
+        
         <!-- Debug Panel -->
         <div class="section">
             <h2>Debug Log</h2>
@@ -367,6 +380,52 @@
                     }
                 })
                 .catch(() => {});
+        }
+        
+        // ============== Dialog Control ==============
+        function appendDialogMessage(sender, text, cssClass) {
+            const log = document.getElementById('dialogLog');
+            const entry = document.createElement('div');
+            entry.className = 'dialog-entry ' + cssClass;
+            entry.textContent = sender + ': ' + text;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        async function sendDialog() {
+            const input = document.getElementById('dialogInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            input.value = '';
+            appendDialogMessage('You', text, 'dialog-user');
+            log('Dialog input: ' + text);
+            
+            try {
+                const result = await apiPost('/api/dialog', { text: text });
+                if (result.status === 'ok') {
+                    appendDialogMessage('Robot', result.response, 'dialog-robot');
+                    if (result.actions && result.actions.length > 0) {
+                        log('Actions: ' + result.actions.join(', '), 'success');
+                    }
+                } else if (result.status === 'no_match') {
+                    appendDialogMessage('Robot', '(no match)', 'dialog-robot dialog-nomatch');
+                } else {
+                    log('Dialog error: ' + (result.message || 'unknown error'), 'error');
+                }
+            } catch (err) {
+                log('Dialog request failed', 'error');
+            }
+        }
+        
+        async function resetDialog() {
+            document.getElementById('dialogLog').innerHTML = '';
+            try {
+                await apiPost('/api/dialog/reset', {});
+                log('Dialog conversation reset', 'success');
+            } catch (err) {
+                log('Dialog reset failed', 'error');
+            }
         }
         
         // ============== Emergency Stop ==============
