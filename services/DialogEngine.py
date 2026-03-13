@@ -56,6 +56,8 @@ class DialogEngine:
             response, actions = engine.process_input("hello there")
     """
 
+    MAX_DEPTH = 6  # max nesting levels (u: through u5:, levels 0-5)
+
     def __init__(self):
         self.filename = None
         self.rules = []            # top-level u: rules
@@ -153,6 +155,18 @@ class DialogEngine:
                 if not output_str:
                     self._warn(line_num, "EMPTY_OUTPUT",
                                f"Rule u{level_str}: has empty output — skipping")
+                    continue
+
+                # Guard: enforce maximum nesting depth
+                if level >= self.MAX_DEPTH:
+                    self._warn(line_num, "MAX_DEPTH",
+                               f"u{level}: exceeds max depth {self.MAX_DEPTH} — skipping")
+                    continue
+
+                # Guard: detect unbalanced brackets in output
+                if output_str.count("[") != output_str.count("]"):
+                    self._warn(line_num, "UNBALANCED_BRACKET",
+                               f"Unbalanced brackets in output — skipping")
                     continue
 
                 rule = Rule(level, pattern_str, output_str, line_num)
@@ -270,10 +284,11 @@ class DialogEngine:
     def _tokenize_pattern(self, pattern_str):
         """
         Tokenize a pattern string into a list of tokens:
-        '[bracketed group]', '_', '*', or literal words.
+        '[bracketed group]', '_', '*', '"quoted phrase"', or literal words.
 
         Handles nested brackets (from ~name expansion inside []) via depth
         tracking. Top-level ~name is expanded directly to a bracket group.
+        Quoted phrases ("multi word") are treated as a single literal token.
         """
         tokens = []
         s = pattern_str.strip()
@@ -282,6 +297,13 @@ class DialogEngine:
             ch = s[i]
             if ch in " \t":
                 i += 1
+            elif ch == '"':
+                # Quoted phrase — treat as a single literal token
+                j = s.find('"', i + 1)
+                if j == -1:
+                    j = len(s)
+                tokens.append(s[i + 1: j])
+                i = j + 1
             elif ch == "[":
                 # Depth-based scan for the matching closing bracket
                 depth = 1
@@ -318,7 +340,7 @@ class DialogEngine:
                 i += 1
             else:
                 j = i
-                while j < len(s) and s[j] not in " \t[]_*~":
+                while j < len(s) and s[j] not in " \t[]_*~\"":
                     j += 1
                 if j > i:
                     tokens.append(s[i:j])
