@@ -9,10 +9,10 @@ import time
 
 
 # Maximum duration (seconds) for any single action — safety bound
-_ACTION_TIMEOUT = 3.0
+_ACTION_TIMEOUT = 6.0
 
 # Intermediate step duration for multi-step movements
-_STEP_DELAY = 0.4
+_STEP_DELAY = 2
 
 
 class ActionRunner:
@@ -59,18 +59,18 @@ class ActionRunner:
 
     def _nod(self):
         """Nod head: tilt down → tilt up → center."""
-        self.robot.head_tilt(5000)
-        time.sleep(_STEP_DELAY)
         self.robot.head_tilt(7000)
-        time.sleep(_STEP_DELAY)
+        time.sleep(.5)
         self.robot.head_tilt(6000)
+        time.sleep(.5)
+        self.robot.head_tilt(5000)
 
     def _shake(self):
         """Shake head: pan left → pan right → center."""
         self.robot.head_pan(5000)
-        time.sleep(_STEP_DELAY)
+        time.sleep(.5)
         self.robot.head_pan(7000)
-        time.sleep(_STEP_DELAY)
+        time.sleep(.5)
         self.robot.head_pan(6000)
 
     def _dance(self):
