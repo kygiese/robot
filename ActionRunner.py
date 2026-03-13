@@ -77,9 +77,9 @@ class ActionRunner:
 
     def _dance(self):
         self.robot.drive(50,50)
-        time.sleep(.7)
-        self.robot.drive(50,50)
-        time.sleep(.7)
+        time.sleep(1)
+        self.robot.drive(-50,-50)
+        time.sleep(1)
         self.robot.drive(0,0)
 
 
