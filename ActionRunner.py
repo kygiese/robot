@@ -90,10 +90,7 @@ class ActionRunner:
 
     def _arm(self):
         """Raise both arms: shoulders up → hold → shoulders down → center."""
-        self.robot.arm_raise(100)
+        self.robot.arm_raise(7000)
         time.sleep(1)
-        self.robot.arm_raise(0)
-        time.sleep(.5)
-        self.robot.arm_raise(-50)
-        time.sleep(.5)
-        self.robot.arm_raise(0)
+        self.robot.arm_raise(6000)
+      
