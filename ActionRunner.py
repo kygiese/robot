@@ -6,6 +6,7 @@ All actions are bounded-time and use the robot_control interface.
 """
 
 import time
+import threading
 
 
 # Maximum duration (seconds) for any single action — safety bound
@@ -25,6 +26,43 @@ class ActionRunner:
 
     def __init__(self, robot):
         self.robot = robot
+        self._cancel_event = threading.Event()
+
+    # ------------------------------------------------------------------ #
+    # Cancellation helpers                                                 #
+    # ------------------------------------------------------------------ #
+
+    def cancel(self):
+        """Signal cancellation so any running / queued actions stop."""
+        self._cancel_event.set()
+        try:
+            self.robot.stop()
+        except Exception:
+            pass
+
+    def _cancelled(self):
+        return self._cancel_event.is_set()
+
+    def _interruptible_sleep(self, seconds):
+        """Sleep that wakes immediately when cancel() is called."""
+        self._cancel_event.wait(seconds)
+
+    # ------------------------------------------------------------------ #
+    # Running actions                                                      #
+    # ------------------------------------------------------------------ #
+
+    def run_actions(self, actions):
+        """
+        Execute a list of actions in order.
+
+        Clears the cancel flag at the start; stops early if cancel() is
+        called while actions are running.
+        """
+        self._cancel_event.clear()
+        for act in actions:
+            if self._cancelled():
+                break
+            self.run_action(act)
 
     def run_action(self, action):
         """
@@ -35,6 +73,9 @@ class ActionRunner:
         Args:
             action (str): Action name (e.g. 'nod', 'shake', 'dance').
         """
+        if self._cancelled():
+            return
+
         action = action.lower().strip()
         handler = {
             "head_yes": self._nod,
@@ -62,32 +103,63 @@ class ActionRunner:
     def _nod(self):
         """Nod head: tilt down → tilt up → center."""
         self.robot.head_tilt(7000)
-        time.sleep(.5)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(.5)
+        if self._cancelled():
+            return
         self.robot.head_tilt(6000)
-        time.sleep(.5)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(.5)
+        if self._cancelled():
+            return
         self.robot.head_tilt(5000)
 
     def _shake(self):
         """Shake head: pan left → pan right → center."""
         self.robot.head_pan(100)
-        time.sleep(.5)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(.5)
+        if self._cancelled():
+            return
         self.robot.head_pan(-100)
-        time.sleep(1)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(1)
+        if self._cancelled():
+            return
         self.robot.head_pan(0)
 
     def _dance(self):
-        self.robot.drive(50,50)
-        time.sleep(1.5)
-        self.robot.drive(-50,-50)
-        time.sleep(3)
-        self.robot.drive(50,50)
-        time.sleep(1.5)
-        self.robot.drive(0,0)
-
+        self.robot.drive(50, 50)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(1.5)
+        if self._cancelled():
+            return
+        self.robot.drive(-50, -50)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(3)
+        if self._cancelled():
+            return
+        self.robot.drive(50, 50)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(1.5)
+        if self._cancelled():
+            return
+        self.robot.drive(0, 0)
 
     def _arm(self):
         """Raise both arms: shoulders up → hold → shoulders down → center."""
         self.robot.arm_raise(7000)
-        time.sleep(1)
+        if self._cancelled():
+            return
+        self._interruptible_sleep(1)
+        if self._cancelled():
+            return
         self.robot.arm_raise(6000)
 

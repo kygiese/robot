@@ -330,6 +330,11 @@ def api_dialog():
 
         response, actions = engine.process_input(user_text)
 
+        # Global interrupt — stop wheels and cancel any running actions
+        if engine.was_interrupted():
+            if runner:
+                runner.cancel()
+
         if response is None:
             return jsonify({"status": "no_match", "response": None, "actions": []})
 
@@ -338,10 +343,8 @@ def api_dialog():
 
         # Run actions in a background thread so the HTTP response returns quickly
         if actions and runner:
-            def _run_actions():
-                for act in actions:
-                    runner.run_action(act)
-            threading.Thread(target=_run_actions, daemon=True).start()
+            threading.Thread(target=runner.run_actions, args=(actions,),
+                             daemon=True).start()
 
         return jsonify({
             "status": "ok",
