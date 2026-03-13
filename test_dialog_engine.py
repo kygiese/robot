@@ -172,6 +172,88 @@ class TestDialogEngineWithTestScript(unittest.TestCase):
         self.assertEqual(resp, "Goodbye!")
         self.assertEqual(actions, ["arm_raise"])
 
+    # ---- Global interrupt -----------------------------------------------
+
+    def test_global_interrupt_from_scope(self):
+        """Interrupt word while in a u1 scope should match the top-level
+        stop rule, clear scope, and set the interrupted flag."""
+        self.engine.process_input("hello")              # enter scope
+        self.assertTrue(len(self.engine.active_subrules) > 0)
+
+        resp, _ = self.engine.process_input("stop")
+        self.assertEqual(resp, "OK. Stopping now.")
+        self.assertTrue(self.engine.was_interrupted())
+        self.assertEqual(self.engine.active_subrules, [])
+
+    def test_global_interrupt_all_keywords(self):
+        """All four interrupt words should work, case-insensitive."""
+        for word in ("Stop", "CANCEL", "Reset", "QUIT"):
+            self.engine.reset()
+            self.engine.process_input("hello")          # enter scope
+            resp, _ = self.engine.process_input(word)
+            self.assertEqual(resp, "OK. Stopping now.",
+                             f"Interrupt word '{word}' failed")
+            self.assertTrue(self.engine.was_interrupted())
+            self.assertEqual(self.engine.active_subrules, [])
+
+    def test_no_interrupt_flag_on_normal_input(self):
+        """Regular input should NOT set the interrupted flag."""
+        resp, _ = self.engine.process_input("hello")
+        self.assertFalse(self.engine.was_interrupted())
+
+    def test_interrupt_clears_variables(self):
+        """Global interrupt should also clear captured variables."""
+        self.engine.process_input("my name is Alice")
+        self.assertIn("name", self.engine.variables)
+
+        self.engine.process_input("quit")
+        self.assertEqual(self.engine.variables, {})
+
+    # ---- Unknown input scope exit ---------------------------------------
+
+    def test_scope_exit_after_four_unknowns(self):
+        """Four consecutive unrecognized inputs in a scope should exit
+        the scope so the engine returns to IDLE."""
+        self.engine.process_input("hello")              # enter scope
+        self.assertTrue(len(self.engine.active_subrules) > 0)
+
+        for _ in range(4):
+            resp, _ = self.engine.process_input("xyzzy gibberish")
+            self.assertIsNone(resp)
+
+        # Scope should now be cleared
+        self.assertEqual(self.engine.active_subrules, [])
+
+    def test_scope_stays_if_fewer_than_four_unknowns(self):
+        """Fewer than four unknowns should NOT exit the scope."""
+        self.engine.process_input("hello")              # enter scope
+        for _ in range(3):
+            self.engine.process_input("xyzzy gibberish")
+        self.assertTrue(len(self.engine.active_subrules) > 0)
+
+    def test_unknown_counter_resets_on_match(self):
+        """A successful match resets the unknown counter."""
+        # Enter the 'let us talk' scope which has u1 rules
+        self.engine.process_input("let us talk")
+        self.engine.process_input("xyzzy gibberish")    # unknown 1
+        self.engine.process_input("xyzzy gibberish")    # unknown 2
+        # Match u1:(are you sad) — resets counter, activates u2 scope
+        resp, _ = self.engine.process_input("are you sad")
+        self.assertIsNotNone(resp)
+        self.assertEqual(self.engine._unknown_count, 0)
+        # 3 more unknowns should NOT exit (only 3, need 4)
+        for _ in range(3):
+            self.engine.process_input("xyzzy gibberish")
+        self.assertEqual(self.engine._unknown_count, 3)
+
+    def test_unknown_counter_not_active_outside_scope(self):
+        """Unknown inputs at the top level should not trigger scope exit."""
+        for _ in range(5):
+            resp, _ = self.engine.process_input("xyzzy gibberish")
+            self.assertIsNone(resp)
+        # No scope was active, so nothing should have changed
+        self.assertEqual(self.engine.active_subrules, [])
+
 
 class TestActionRunnerWarning(unittest.TestCase):
     """Test that unknown actions produce a warning."""
@@ -194,6 +276,36 @@ class TestActionRunnerWarning(unittest.TestCase):
             sys.stdout = sys.__stdout__
 
         self.assertIn("unknown action", captured.getvalue().lower())
+
+
+class TestActionRunnerCancellation(unittest.TestCase):
+    """Test that ActionRunner cancellation stops action sequences."""
+
+    def test_cancel_stops_remaining_actions(self):
+        from unittest.mock import MagicMock
+        from ActionRunner import ActionRunner
+
+        mock_robot = MagicMock()
+        runner = ActionRunner(mock_robot)
+
+        # Cancel then call run_action directly — should be a no-op
+        runner.cancel()
+        runner.run_action("head_yes")
+
+        # head_tilt should not have been called
+        mock_robot.head_tilt.assert_not_called()
+
+    def test_run_actions_clears_cancel(self):
+        from unittest.mock import MagicMock
+        from ActionRunner import ActionRunner
+
+        mock_robot = MagicMock()
+        runner = ActionRunner(mock_robot)
+
+        # Cancel, then start a new sequence — cancel should be cleared
+        runner.cancel()
+        runner.run_actions(["head_yes"])
+        mock_robot.head_tilt.assert_called()
 
 
 if __name__ == "__main__":

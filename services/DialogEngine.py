@@ -58,6 +58,12 @@ class DialogEngine:
 
     MAX_DEPTH = 6  # max nesting levels (u: through u5:, levels 0-5)
 
+    GLOBAL_INTERRUPT_WORDS = frozenset({"stop", "cancel", "reset", "quit"})
+
+    # Number of consecutive unrecognized inputs (while in a scope) before
+    # the engine automatically exits the scope and returns to IDLE.
+    MAX_UNKNOWN_BEFORE_EXIT = 4
+
     def __init__(self):
         self.filename = None
         self.rules = []            # top-level u: rules
@@ -66,6 +72,8 @@ class DialogEngine:
         self.active_subrules = []  # currently active u1: (or u2:) rules
         self.errors = []
         self._loaded = False
+        self._unknown_count = 0    # consecutive unrecognized inputs in scope
+        self._interrupted = False  # set after a global interrupt
 
     # ------------------------------------------------------------------ #
     # Loading / Parsing                                                    #
@@ -222,6 +230,11 @@ class DialogEngine:
         - If a u: rule matches, its u1: subrules become the active scope.
         - If a u1: rule matches (in scope), its u2: subrules become active.
         - Matching a new u: rule always clears any previous scope.
+        - Global interrupt words (stop/cancel/reset/quit) always match
+          against top-level rules first, clear scope, and set the
+          interrupted flag so the caller can stop wheels and actions.
+        - If MAX_UNKNOWN_BEFORE_EXIT consecutive unrecognized inputs
+          occur while in a scope, the scope is cleared (return to IDLE).
 
         Returns (response_text, actions_list).
         Returns (None, []) when no rule matches.
@@ -229,9 +242,26 @@ class DialogEngine:
         if not self._loaded:
             return ("Dialog engine not loaded.", [])
 
+        self._interrupted = False
         normalized = self._normalize_input(user_input)
 
-        # Try active subrules first
+        # --- Global interrupt: always checked first ----------------------
+        if normalized in self.GLOBAL_INTERRUPT_WORDS:
+            # Try to find a matching top-level rule for the response text
+            for rule in self.rules:
+                captures = self._match_pattern(normalized, rule.pattern_str)
+                if captures is not None:
+                    self._assign_captures(captures, rule.output_str)
+                    response, actions = self._build_output(rule.output_str)
+                    self.reset()
+                    self._interrupted = True
+                    return (response, actions)
+            # No matching rule — still reset and signal interrupt
+            self.reset()
+            self._interrupted = True
+            return ("OK. Stopping now.", [])
+
+        # --- Try active subrules first -----------------------------------
         if self.active_subrules:
             for rule in self.active_subrules:
                 captures = self._match_pattern(normalized, rule.pattern_str)
@@ -239,9 +269,10 @@ class DialogEngine:
                     self._assign_captures(captures, rule.output_str)
                     response, actions = self._build_output(rule.output_str)
                     self.active_subrules = rule.subrules
+                    self._unknown_count = 0
                     return (response, actions)
 
-        # Fall through to top-level rules
+        # --- Fall through to top-level rules -----------------------------
         for rule in self.rules:
             captures = self._match_pattern(normalized, rule.pattern_str)
             if captures is not None:
@@ -249,7 +280,16 @@ class DialogEngine:
                 response, actions = self._build_output(rule.output_str)
                 # New top-level match: replace scope with this rule's subrules
                 self.active_subrules = rule.subrules
+                self._unknown_count = 0
                 return (response, actions)
+
+        # --- No match ----------------------------------------------------
+        # Track consecutive unknown inputs while in a scope
+        if self.active_subrules:
+            self._unknown_count += 1
+            if self._unknown_count >= self.MAX_UNKNOWN_BEFORE_EXIT:
+                self.active_subrules = []
+                self._unknown_count = 0
 
         return (None, [])
 
@@ -257,6 +297,11 @@ class DialogEngine:
         """Reset conversational state (variables and scope) without unloading rules."""
         self.variables = {}
         self.active_subrules = []
+        self._unknown_count = 0
+
+    def was_interrupted(self):
+        """Return True if the last ``process_input`` call was a global interrupt."""
+        return self._interrupted
 
     # ------------------------------------------------------------------ #
     # Pattern matching helpers                                             #
