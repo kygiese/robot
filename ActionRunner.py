@@ -76,10 +76,10 @@ class ActionRunner:
         self.robot.head_pan(6000)
 
     def _dance(self):
-        self.robot.drive(50,0)
-        time.sleep(.5)
-        self.robot.drive(0,50)
-        time.sleep(.5)
+        self.robot.drive(50,-50)
+        time.sleep(.7)
+        self.robot.drive(-50,50)
+        time.sleep(.7)
         self.robot.drive(0,0)
 
 
