@@ -20,6 +20,8 @@ This layer is callable directly from Python for testing.
 import threading
 import time
 
+import lidar
+
 # Safe limits for servo positions (quarter-microseconds)
 # Standard servo range is 3000-9000, center at 6000
 SERVO_MIN = 4000
@@ -158,6 +160,7 @@ class RobotControl:
                 self._head = head.Head(SERVO_MIN, SERVO_MAX)
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
                 self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
+                self._lidar = lidar.Lidar()
             
             # Set to neutral/center position
             self.stop()
@@ -325,8 +328,13 @@ class RobotControl:
         if max_val > 100:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
-        
-        return self.drive(left_speed, right_speed)
+
+        if not self._lidar.checkF and left_speed > 0 and right_speed > 0:
+            return self.drive(0,0)
+        elif not self._lidar.checkB and left_speed < 0 and right_speed < 0:
+            return self.drive(0,0)
+        else:
+            return self.drive(left_speed, right_speed)
     
     def head_pan(self, position):
         """

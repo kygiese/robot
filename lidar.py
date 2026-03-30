@@ -1,6 +1,6 @@
 from rplidar import RPLidar
 
-class Lidar():
+class Lidar:
     def __init__(self):
         self.lidar = RPLidar('/dev/tty/USB0')
 
@@ -17,3 +17,8 @@ class Lidar():
              print(measure[3])
              if i > 10:
                  break
+
+    def checkF(self):
+        print("dowojk")
+    def checkB(self):
+        print("dfojke")
