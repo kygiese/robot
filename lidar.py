@@ -10,6 +10,9 @@ class Lidar:
         print(self.lidar.get_health())
 
     def test(self):
-        for scan in self.lidar.iter_scans():
-            for (quality, angle, distance) in scan:
-                print(angle, distance)
+        for scan_idx, scan in enumerate(self.lidar.iter_scans()):
+            print(f"\n=== scan {scan_idx}  points={len(scan)} ===")
+
+            # scan is a list of (quality, angle, distance)
+            for i, (quality, angle, distance) in enumerate(scan):
+                print(f"{i}: quality={quality} angle={angle:.2f} distance={distance:.1f}")
