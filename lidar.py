@@ -1,8 +1,8 @@
 from rplidar import RPLidar
 
-class Lidar():
+class Lidar:
     def __init__(self):
-        self.lidar = RPLidar('/dev/tty/USB0')
+        self.lidar = RPLidar('/dev/ttyUSB0', 115200)
 
 
     def health_check(self):
@@ -10,10 +10,6 @@ class Lidar():
         print(self.lidar.get_health())
 
     def test(self):
-         for i, measure in enumerate(self.lidar.iter_measurments()):
-             print("------------------------------------")
-             print(measure[1])
-             print(measure[2])
-             print(measure[3])
-             if i > 10:
-                 break
+        for scan in self.lidar.iter_scans():
+            print(scan[0], scan[1], scan[2])
+
