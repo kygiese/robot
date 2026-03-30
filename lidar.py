@@ -11,4 +11,5 @@ class Lidar:
         print(self.lidar.get_health())
 
     def test(self):
-        
+
+#https://github.com/Slamtec/rplidar_sdk/tree/master
