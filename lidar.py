@@ -11,5 +11,5 @@ class Lidar:
 
     def test(self):
         for scan in self.lidar.iter_scans():
-            print(scan[0], scan[1], scan[2])
+            print('Got %d measurments' % (len(scan)))
 
