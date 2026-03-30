@@ -10,6 +10,6 @@ class Lidar:
         print(self.lidar.get_health())
 
     def test(self):
-        for scan in self.lidar.iter_scans():
+        for scan in enumerate(self.lidar.iter_scans()):
             print('Got %d measurments' % (len(scan)))
 
