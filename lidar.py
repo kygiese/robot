@@ -16,13 +16,14 @@ class Lidar:
 
     def test(self):
         scan_data = [0] * 360
+        a = 0
         try:
             print(self.lidar.info)
             for scan in self.lidar.iter_scans():
                 for (_, angle, distance) in scan:
                     scan_data[min([359, floor(angle)])] = distance
-                    print(distance)
-                    print(angle)
+                    a = angle
+                print(a)
             process_data(scan_data)
         except KeyboardInterrupt:
             print('Stopping.')
