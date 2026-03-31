@@ -7,7 +7,7 @@ class Lidar:
     def __init__(self):
         self.checkB = True
         self.checkF = True
-        self.lidar = RPLidar(None, 'dev/ttyUSB0', timeout=5)
+        self.lidar = RPLidar(None, '/dev/ttyUSB0', timeout=5)
 
 
     def health_check(self):
