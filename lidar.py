@@ -16,6 +16,7 @@ class Lidar:
 
     def test(self):
         scan_data = [0] * 360
+        a = 0
         try:
             print(self.lidar.info)
             for scan in self.lidar.iter_scans():
@@ -24,16 +25,13 @@ class Lidar:
                     if angle > 0 and angle < 180:
                         if distance < 200:
                             self.checkF = True
-                        else:
-                            self.checkF = False
                     else:
                         if distance < 200:
                             self.checkB = True
-                        else:
-                            self.checkB = False
-                    print(self.checkF, self.checkB)
+                print(self.checkF, self.checkB)
+                self.checkF = False
+                self.checkB = False
 
-            process_data(scan_data)
         except KeyboardInterrupt:
             print('Stopping.')
         self.lidar.stop()
