@@ -154,7 +154,7 @@ class RobotControl:
                 self._head = MockHead(SERVO_MIN, SERVO_MAX)
                 self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
                 self._arm = MockArm(SERVO_MIN, SERVO_MAX)
-             #   self._lidar = lidar.get_lidar()
+                self._lidar = lidar.Lidar()
 
             else:
                 # Use real hardware components
@@ -162,11 +162,12 @@ class RobotControl:
                 self._head = head.Head(SERVO_MIN, SERVO_MAX)
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
                 self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
-              #  self._lidar = lidar.get_lidar()
+                self._lidar = lidar.Lidar()
             
             # Set to neutral/center position
             self.stop()
-            
+
+
         except Exception as e:
             print(f"Warning: Could not initialize hardware components: {e}")
             print("Running in mock mode")
