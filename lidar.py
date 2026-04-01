@@ -1,14 +1,14 @@
 from math import floor
-
 from adafruit_rplidar import RPLidar
-
+import threading
+import subprocess
+from time import sleep
 
 class Lidar:
     def __init__(self):
         self.checkB = True
         self.checkF = True
         self.lidar = RPLidar(None, '/dev/ttyUSB0', timeout=5)
-
 
     def health_check(self):
         print(self.lidar.info())
@@ -22,7 +22,7 @@ class Lidar:
             for scan in self.lidar.iter_scans():
                 for (_, angle, distance) in scan:
                     scan_data[min([359, floor(angle)])] = distance
-                    if angle > 0 and angle < 180:
+                    if angle > 90 and angle < 270:
                         if distance < 200:
                             self.checkF = True
                     else:
@@ -37,9 +37,30 @@ class Lidar:
         self.lidar.stop()
         self.lidar.disconnect()
 
+    def mock_test(self):
+        while(True):
+            self.checkB = True
+            self.checkF = False
+            sleep(5)
+            self.checkB = False
+            self.checkF = True
+            sleep(5)
+
+_lidar = None
+_lidar_lock = threading.Lock()
+def get_lidar():
+    global _lidar
+    if _lidar is None:
+        lidar = Lidar()
+        _lidar = lidar
+        threading.Thread(target=_lidar.mock_test(), daemon=True).start()
+    return _lidar
+
+
+
+
 def process_data(data):
     for angle in range(360):
         distance = data[angle]
         print(angle, distance)
 
-#https://github.com/Slamtec/rplidar_sdk/tree/master

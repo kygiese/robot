@@ -154,13 +154,15 @@ class RobotControl:
                 self._head = MockHead(SERVO_MIN, SERVO_MAX)
                 self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
                 self._arm = MockArm(SERVO_MIN, SERVO_MAX)
+                self._lidar = lidar.get_lidar()
+
             else:
                 # Use real hardware components
                 self._wheels = wheel.Wheel(SERVO_MIN, SERVO_MAX)
                 self._head = head.Head(SERVO_MIN, SERVO_MAX)
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
                 self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
-                self._lidar = lidar.Lidar()
+                self._lidar = lidar.get_lidar()
             
             # Set to neutral/center position
             self.stop()
@@ -329,9 +331,9 @@ class RobotControl:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
 
-        if not self._lidar.checkF and left_speed > 0 and right_speed > 0:
+        if lidar.get_lidar().checkF and left_speed < 0 and right_speed > 0:
             return self.drive(0,0)
-        elif not self._lidar.checkB and left_speed < 0 and right_speed < 0:
+        elif lidar.get_lidar().checkB and left_speed > 0 and right_speed < 0:
             return self.drive(0,0)
         else:
             return self.drive(left_speed, right_speed)
