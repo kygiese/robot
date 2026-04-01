@@ -163,7 +163,7 @@ class RobotControl:
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
                 self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
                 self._lidar = lidar.Lidar()
-                threading.Thread(target=self._lidar.test(), daemon=True).start()
+                threading.Thread(target=self._lidar.test, daemon=True).start()
             
             # Set to neutral/center position
             self.stop()
