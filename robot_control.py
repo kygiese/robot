@@ -167,7 +167,11 @@ class RobotControl:
                 self._lidar = lidar.Lidar()
                 self._lidar_thread = threading.Thread(target=self._lidar.test, daemon=True)
                 self._lidar_thread.start()
+                print("thread init")
                 print(self._lidar_thread.is_alive())
+                print("-=======-==============")
+                print(self._lidar.checkB)
+                print(self._lidar.checkF)
             
             # Set to neutral/center position
             self.stop()
