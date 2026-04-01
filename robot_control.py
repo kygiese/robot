@@ -189,7 +189,7 @@ class RobotControl:
             time.sleep(0.5)
             with self._lock:
                 elapsed = time.time() - self._last_command_time
-                if elapsed > self._heartbeat_timeout or lidar.get_lidar().checkB or lidar.get_lidar().checkF:
+                if elapsed > self._heartbeat_timeout or self._lidar.checkB or self._lidar.checkF:
                     # No recent commands - stop wheels for safety
                     if self._left_wheel_speed != 0 or self._right_wheel_speed != 0:
                         self._set_wheel_speeds_internal(0, 0)
@@ -332,9 +332,9 @@ class RobotControl:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
 
-        if lidar.get_lidar().checkF and left_speed < 0 and right_speed > 0:
+        if self._lidar.checkF and left_speed < 0 and right_speed > 0:
             return self.drive(0,0)
-        elif lidar.get_lidar().checkB and left_speed > 0 and right_speed < 0:
+        elif self._lidar.checkB and left_speed > 0 and right_speed < 0:
             return self.drive(0,0)
         else:
             return self.drive(left_speed, right_speed)
