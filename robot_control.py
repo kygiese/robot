@@ -155,6 +155,7 @@ class RobotControl:
                 self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
                 self._arm = MockArm(SERVO_MIN, SERVO_MAX)
                 self._lidar = lidar.Lidar()
+                threading.Thread(target=self._lidar.test(), daemon=True).start()
 
             else:
                 # Use real hardware components
