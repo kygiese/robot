@@ -17,23 +17,20 @@ class Lidar:
     def test(self):
         scan_data = [0] * 360
         a = 0
-        try:
-            print(self.lidar.info)
-            for scan in self.lidar.iter_scans():
-                for (_, angle, distance) in scan:
-                    scan_data[min([359, floor(angle)])] = distance
-                    if angle > 240 and angle < 300:
-                        if distance < 600:
-                            self.checkF = True
-                    elif angle > 100 and angle < 160:
-                        if distance < 600:
-                            self.checkB = True
-                print(self.checkF, self.checkB)
-                self.checkF = False
-                self.checkB = False
+        # print(self.lidar.info)
+        for scan in self.lidar.iter_scans():
+            for (_, angle, distance) in scan:
+                scan_data[min([359, floor(angle)])] = distance
+                if angle > 240 and angle < 300:
+                    if distance < 600:
+                        self.checkF = True
+                elif angle > 100 and angle < 160:
+                    if distance < 600:
+                        self.checkB = True
+            # print(self.checkF, self.checkB)
+            self.checkF = False
+            self.checkB = False
 
-        except KeyboardInterrupt:
-            print('Stopping.')
         self.lidar.stop()
         self.lidar.disconnect()
 
@@ -45,6 +42,7 @@ class Lidar:
             self.checkB = False
             self.checkF = True
             sleep(5)
+
 
 _lidar = None
 _lidar_lock = threading.Lock()
