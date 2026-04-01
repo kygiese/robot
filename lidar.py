@@ -9,7 +9,7 @@ class Lidar:
         self.checkB = True
         self.checkF = True
         self.lidar = RPLidar(None, '/dev/ttyUSB0', timeout=5)
-        threading.Thread(target=self.test(), daemon=True).start()
+
 
     def health_check(self):
         print(self.lidar.info())
@@ -43,7 +43,6 @@ class Lidar:
             self.checkB = False
             self.checkF = True
             sleep(5)
-
 
 
 
