@@ -22,11 +22,11 @@ class Lidar:
             for scan in self.lidar.iter_scans():
                 for (_, angle, distance) in scan:
                     scan_data[min([359, floor(angle)])] = distance
-                    if angle > 90 and angle < 270:
-                        if distance < 200:
+                    if angle > 240 and angle < 300:
+                        if distance < 600:
                             self.checkF = True
-                    else:
-                        if distance < 200:
+                    elif angle > 100 and angle < 160:
+                        if distance < 600:
                             self.checkB = True
                 print(self.checkF, self.checkB)
                 self.checkF = False
