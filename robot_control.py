@@ -165,7 +165,7 @@ class RobotControl:
                 self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
 
                 self._lidar = lidar.Lidar()
-                self._lidar_thread = threading.Thread(target=self._lidar.test, daemon=True)
+                self._lidar_thread = threading.Thread(target=self._lidar.test(), daemon=True)
                 self._lidar_thread.start()
                 print("thread init")
                 print(self._lidar_thread.is_alive())

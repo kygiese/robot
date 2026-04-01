@@ -28,7 +28,7 @@ class Lidar:
                 elif angle > 100 and angle < 160:
                     if distance < 600:
                         self.checkB = True
-            # print(self.checkF, self.checkB)
+            print(self.checkF, self.checkB)
             self.checkF = False
             self.checkB = False
 
