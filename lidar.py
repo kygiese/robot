@@ -53,7 +53,7 @@ def get_lidar():
     if _lidar is None:
         lidar = Lidar()
         _lidar = lidar
-        threading.Thread(target=_lidar.mock_test(), daemon=True).start()
+        threading.Thread(target=_lidar.test(), daemon=True).start()
     return _lidar
 
 
