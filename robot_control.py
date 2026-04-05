@@ -154,8 +154,7 @@ class RobotControl:
                 self._head = MockHead(SERVO_MIN, SERVO_MAX)
                 self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
                 self._arm = MockArm(SERVO_MIN, SERVO_MAX)
-                self._lidar = lidar.Lidar()
-                threading.Thread(target=self._lidar.test(), daemon=True).start()
+
 
             else:
                 # Use real hardware components
@@ -342,9 +341,9 @@ class RobotControl:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
 
-        if self._lidar.checkF and left_speed < 0 and right_speed > 0:
+        if self._lidar.checkF and left_speed < 0 < right_speed:
             return self.drive(0,0)
-        elif self._lidar.checkB and left_speed > 0 and right_speed < 0:
+        elif self._lidar.checkB and left_speed > 0 > right_speed:
             return self.drive(0,0)
         else:
             return self.drive(left_speed, right_speed)

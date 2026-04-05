@@ -22,10 +22,10 @@ class Lidar:
         for scan in self.lidar.iter_scans():
             for (_, angle, distance) in scan:
                 scan_data[min([359, floor(angle)])] = distance
-                if angle > 240 and angle < 300:
+                if 240 < angle < 300:
                     if distance < 600:
                         self.checkF = True
-                elif angle > 100 and angle < 160:
+                elif 100 < angle < 160:
                     if distance < 600:
                         self.checkB = True
             print(self.checkF, self.checkB)
@@ -36,7 +36,7 @@ class Lidar:
         self.lidar.disconnect()
 
     def mock_test(self):
-        while(True):
+        while True:
             self.checkB = True
             self.checkF = False
             sleep(5)
@@ -45,9 +45,11 @@ class Lidar:
             sleep(5)
 
 
-
 def process_data(data):
     for angle in range(360):
         distance = data[angle]
         print(angle, distance)
 
+lidar = Lidar()
+lidar.health_check()
+lidar.test()
