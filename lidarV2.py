@@ -58,7 +58,6 @@ class Lidar:
         print("2-----------------------------------------")
         lidar.set_motor_pwm(500)
         print("3-----------------------------------------")
-
         time.sleep(2)
         print("4-----------------------------------------")
         scan_generator = lidar.force_scan()
@@ -76,10 +75,11 @@ class Lidar:
                         self.checkB = True
                     else:
                         self.checkF = False
+                if not scan.quality <= .01:
+                    print(self.checkF, self.checkB)
+                    self.checkF = False
+                    self.checkB = False
 
-                print(self.checkF, self.checkB)
-                self.checkF = False
-                self.checkB = False
         except KeyboardInterrupt:
             lidar.stop()
             lidar.set_motor_pwm(0)
