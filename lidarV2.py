@@ -42,6 +42,34 @@ def simple_scan():
 
     lidar.disconnect()
 
+def lidar_scan():
+    lidar = PyRPlidar()
+    lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
+
+    lidar.set_motor_pwm(500)
+    time.sleep(2)
+
+    scan_generator = lidar.force_scan()
+    scan_data = [0] * 360
+
+    for count, scan in enumerate(scan_generator()):
+        for (_, angle, distance) in scan:
+            scan_data[min([359, floor(angle)])] = distance
+            if 240 < angle < 300:
+                if distance < 600:
+                    self.checkF = True
+            elif 100 < angle < 160:
+                if distance < 600:
+                    self.checkB = True
+        print(self.checkF, self.checkB)
+        self.checkF = False
+        self.checkB = False
+
+
+    lidar.stop()
+    lidar.set_motor_pwm(0)
+
+    lidar.disconnect()
 
 if __name__ == "__main__":
     simple_scan()
