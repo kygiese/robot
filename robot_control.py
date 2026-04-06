@@ -168,7 +168,7 @@ class RobotControl:
                 self._lidar_thread.start()
                 print("thread init")
                 print(self._lidar_thread.is_alive())
-                print("-=======-==============")
+                print("-============================")
                 print(self._lidar.checkB)
                 print(self._lidar.checkF)
             
