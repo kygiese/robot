@@ -64,13 +64,15 @@ class Lidar:
             if 240 < scan.angle < 300:
                 if scan.distance < 600:
                     self.checkF = True
+                else:
+                    self.checkB = False
             elif 100 < scan.angle < 160:
                 if scan.distance < 600:
                     self.checkB = True
+                else:
+                    self.checkF = False
 
             print(self.checkF, self.checkB)
-            self.checkF = False
-            self.checkB = False
 
         lidar.stop()
         lidar.set_motor_pwm(0)
