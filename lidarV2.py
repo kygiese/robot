@@ -33,13 +33,13 @@ class Lidar:
 
     def simple_scan(self):
         lidar = PyRPlidar()
-        print(1)
+        print("1-----------------------------------------")
         lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
-        print(2)
+        print("2-----------------------------------------")
         lidar.set_motor_pwm(500)
-        print(3)
+        print("3-----------------------------------------")
         time.sleep(2)
-        print(4)
+        print("4--------------------------------------")
         scan_generator = lidar.force_scan()
 
         for count, scan in enumerate(scan_generator()):
