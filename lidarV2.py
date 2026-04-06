@@ -75,7 +75,7 @@ class Lidar:
                         self.checkB = True
                     else:
                         self.checkF = False
-                if not scan.quality <= .01:
+                if not scan.quality == 0:
                     print(self.checkF, self.checkB)
                     self.checkF = False
                     self.checkB = False
