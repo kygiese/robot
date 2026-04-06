@@ -76,14 +76,12 @@ class Lidar:
                         self.checkB = True
                     else:
                         self.checkF = False
-                if count % 10 == 0:
-                    print(self.checkF, self.checkB)
+                print(self.checkF, self.checkB)
 
         except KeyboardInterrupt:
             lidar.stop()
             lidar.set_motor_pwm(0)
             lidar.disconnect()
-
 
 
 if __name__ == "__main__":
