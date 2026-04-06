@@ -34,8 +34,7 @@ class Lidar:
     def simple_scan(self):
         lidar = PyRPlidar()
         lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
-
-        lidar.set_motor_pwm(500)
+        lidar.set_motor_pwm(0)
         time.sleep(2)
 
         scan_generator = lidar.force_scan()
@@ -73,10 +72,11 @@ class Lidar:
                     self.checkF = False
 
             print(self.checkF, self.checkB)
+            self.checkF = False
+            self.checkB = False
 
         lidar.stop()
         lidar.set_motor_pwm(0)
-
         lidar.disconnect()
 
 if __name__ == "__main__":
