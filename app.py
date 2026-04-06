@@ -18,7 +18,6 @@ import time
 import os
 import threading
 
-from lidar import Lidar
 from services.text_to_speech import TextToSpeech, get_default_phrases
 from services.DialogEngine import DialogEngine
 from ActionRunner import ActionRunner
