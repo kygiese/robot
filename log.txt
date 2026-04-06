@@ -1,0 +1,7 @@
+4/6
+- tested new lidar library (pyrplidar) and fixed baudrate in test code
+- figured out how to access distance and angle with the new library
+- the first time we tried it didn't work, but then it started working with no changes
+- scan is working and can display true and false
+- change location of scan flags reset, so it will remember something is there until it checks and nothing is there
+
