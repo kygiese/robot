@@ -86,7 +86,6 @@ class Lidar:
             lidar.disconnect()
 
 
-
 if __name__ == "__main__":
     lidar = Lidar()
     lidar.simple_scan()
