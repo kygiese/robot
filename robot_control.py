@@ -138,6 +138,9 @@ class RobotControl:
         self._heartbeat_timeout = 2.0  # seconds
         self._safety_thread = None
         self._running = False
+
+        self._lidar = None
+        self._lidar_thread = None
         
         # Initialize components using hierarchical structure
         self._init_components()
@@ -164,8 +167,9 @@ class RobotControl:
                 self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
 
                 self._lidar = lidar.Lidar()
-                self._lidar_thread = threading.Thread(target=self._lidar.lidar_scan(), daemon=True)
+                self._lidar_thread = threading.Thread(target=self._lidar.lidar_scan())
                 self._lidar_thread.start()
+                time.sleep(6)
                 print("thread init")
                 print(self._lidar_thread.is_alive())
                 print("-============================")

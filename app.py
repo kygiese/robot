@@ -36,8 +36,8 @@ _dialog_engine = None
 _action_runner = None
 _dialog_lock = threading.Lock()
 
-_lidar = None
-_lidar_lock = threading.Lock()
+#_lidar = None
+#_lidar_lock = threading.Lock()
 
 # Default script path (relative to app.py location)
 _DEFAULT_SCRIPT = os.path.join(os.path.dirname(__file__), "testDialogFileForPractice.txt")
