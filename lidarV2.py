@@ -62,19 +62,35 @@ class Lidar:
         print("4-----------------------------------------")
         scan_generator = lidar.force_scan()
         scan_data = [0] * 360
+        tempF = False
+        tempB = False
+
         try:
             for count, scan in enumerate(scan_generator()):
                 scan_data[min([359, floor(scan.angle)])] = scan.distance
                 if 240 < scan.angle < 300:
                     if scan.distance < 600 and scan.quality > 0:
-                        self.checkF = True
+                        if tempF:
+                            self.checkF = True
+                        else:
+                            tempF = True
                     else:
-                        self.checkF = False
+                        if not tempF:
+                            self.checkF = False
+                        else:
+                            tempF = False
                 elif 100 < scan.angle < 160:
                     if scan.distance < 600 and scan.quality > 0:
-                        self.checkB = True
+                        if tempB:
+                            self.checkB = True
+                        else:
+                            tempB = True
                     else:
-                        self.checkB = False
+                        if not tempB:
+                            self.checkB = False
+                        else:
+                            tempB = False
+
 
                 if not scan.quality == 0:
                     print(self.checkF, self.checkB)
