@@ -92,8 +92,8 @@ class Lidar:
                             tempB = False
 
 
-                if not scan.quality == 0:
-                    print(self.checkF, self.checkB)
+                #if not scan.quality == 0:
+                    #print(self.checkF, self.checkB)
 
         except KeyboardInterrupt:
             lidar.stop()
