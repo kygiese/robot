@@ -4,9 +4,10 @@ import time
 
 
 class Lidar:
-    def __init__(self):
+    def __init__(self, robot):
         self.checkB = True
         self.checkF = True
+        self.robot = robot
 
     def get_info(self):
         lidar = PyRPlidar()
@@ -72,6 +73,7 @@ class Lidar:
                     if scan.distance < 600 and scan.quality > 0:
                         if tempF:
                             self.checkF = True
+                            self.robot.stop()
                         else:
                             tempF = True
                     else:
@@ -83,6 +85,7 @@ class Lidar:
                     if scan.distance < 600 and scan.quality > 0:
                         if tempB:
                             self.checkB = True
+                            self.robot.stop()
                         else:
                             tempB = True
                     else:

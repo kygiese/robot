@@ -166,7 +166,7 @@ class RobotControl:
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
                 self._arm = arm.Arm(SERVO_MIN, SERVO_MAX)
 
-                self._lidar = lidar.Lidar()
+                self._lidar = lidar.Lidar(self)
                 self._lidar_thread = threading.Thread(target=self._lidar.lidar_scan)
                 self._lidar_thread.start()
                 time.sleep(6)
