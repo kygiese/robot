@@ -1,13 +1,15 @@
 from pyrplidar import PyRPlidar
 from math import floor
 import time
-
+import atexit
 
 class Lidar:
     def __init__(self, robot):
         self.checkB = True
         self.checkF = True
         self.robot = robot
+        self.lidar = PyRPlidar()
+
 
     def get_info(self):
         lidar = PyRPlidar()
@@ -53,15 +55,15 @@ class Lidar:
         lidar.disconnect()
 
     def lidar_scan(self):
-        lidar = PyRPlidar()
         print("1-----------------------------------------")
-        lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
+        self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
         print("2-----------------------------------------")
-        lidar.set_motor_pwm(500)
+        self.lidar.set_motor_pwm(500)
         print("3-----------------------------------------")
         time.sleep(2)
         print("4-----------------------------------------")
-        scan_generator = lidar.force_scan()
+
+        scan_generator = self.lidar.force_scan()
         scan_data = [0] * 360
         tempF = False
         tempB = False
@@ -99,10 +101,14 @@ class Lidar:
                     #print(self.checkF, self.checkB)
 
         except KeyboardInterrupt:
-            lidar.stop()
-            lidar.set_motor_pwm(0)
-            lidar.disconnect()
+            self.lidar.stop()
+            self.lidar.set_motor_pwm(0)
+            self.lidar.disconnect()
 
+    def shutdown(self):
+        self.lidar.stop()
+        self.lidar.set_motor_pwm(0)
+        self.lidar.disconnect()
 
 if __name__ == "__main__":
     lidar = Lidar()

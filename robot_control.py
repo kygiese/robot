@@ -19,7 +19,7 @@ This layer is callable directly from Python for testing.
 
 import threading
 import time
-
+import atexit
 import lidarV2 as lidar
 
 # Safe limits for servo positions (quarter-microseconds)
@@ -147,6 +147,8 @@ class RobotControl:
         
         # Start safety monitoring
         self._start_safety_monitor()
+
+        atexit.register(self.shutdown)
     
     def _init_components(self):
         """Initialize the robot components using hierarchical structure"""
@@ -161,6 +163,7 @@ class RobotControl:
 
             else:
                 # Use real hardware components
+
                 self._wheels = wheel.Wheel(SERVO_MIN, SERVO_MAX)
                 self._head = head.Head(SERVO_MIN, SERVO_MAX)
                 self._waist_component = waist.Waist(SERVO_MIN, SERVO_MAX)
@@ -482,6 +485,7 @@ class RobotControl:
         """Cleanup and shutdown the robot control"""
         self._running = False
         self.stop()
+        self._lidar.shutdown()
         # Close component controllers if they have close methods
         for component in [self._wheels, self._head, self._waist_component, self._arm]:
             if hasattr(component, 'controller') and hasattr(component.controller, 'close'):
