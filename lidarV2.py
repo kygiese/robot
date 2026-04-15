@@ -76,21 +76,24 @@ class Lidar:
                     if scan.distance < 600 and scan.quality > 0:
                         if tempF:
                             self.checkF = True
-                            if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
-                                self.robot.drive(0, 0)
+                           # if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
+                            self.robot.drive(0, 0)
                         else:
                             tempF = True
-                    else:
+                    elif scan.quality > 0:
                         if not tempF:
                             self.checkF = False
                         else:
                             tempF = False
+                    else:
+                        pass
+
                 elif 100 < scan.angle < 160:
                     if scan.distance < 600 and scan.quality > 0:
                         if tempB:
                             self.checkB = True
-                            if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
-                             self.robot.drive(0, 0)
+                            #if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
+                            self.robot.drive(0, 0)
                         else:
                             tempB = True
                     else:
