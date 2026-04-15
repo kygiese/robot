@@ -61,7 +61,7 @@ class Lidar:
         print("2-----------------------------------------")
         self.lidar.set_motor_pwm(500)
         print("3-----------------------------------------")
-        time.sleep(2)
+        #time.sleep(2)
         print("4-----------------------------------------")
 
         scan_generator = self.lidar.force_scan()
@@ -72,8 +72,8 @@ class Lidar:
         try:
             for count, scan in enumerate(scan_generator()):
                 scan_data[min([359, floor(scan.angle)])] = scan.distance
-                if 240 < scan.angle < 300:
-                    if scan.distance < 600 and scan.quality > 0:
+                if 240 < scan.angle < 300 and scan.quality > 0:
+                    if scan.distance < 600:
                         if tempF:
                             self.checkF = True
                             if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
@@ -86,8 +86,8 @@ class Lidar:
                         else:
                             tempF = False
 
-                elif 100 < scan.angle < 160:
-                    if scan.distance < 600 and scan.quality > 0:
+                elif 100 < scan.angle < 160 and scan.quality > 0:
+                    if scan.distance < 600:
                         if tempB:
                             self.checkB = True
                             if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
@@ -100,6 +100,7 @@ class Lidar:
                         else:
                             tempB = False
 
+                print(self.checkF + "   " + self.checkB)
 
                 #if not scan.quality == 0:
                     #print(self.checkF, self.checkB)

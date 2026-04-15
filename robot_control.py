@@ -209,7 +209,6 @@ class RobotControl:
             time.sleep(0.5)
             with self._lock:
                 elapsed = time.time() - self._last_command_time
-                print("Front: " , self._lidar.checkF , " Back: " , self._lidar.checkB)
                 if elapsed > self._heartbeat_timeout:
                     # No recent commands - stop wheels for safety
                     if self._left_wheel_speed != 0 or self._right_wheel_speed != 0:
