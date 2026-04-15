@@ -1,5 +1,5 @@
 from pyrplidar import PyRPlidar
-from robot_control import RobotControl
+import robot_control
 from math import floor
 import time
 import atexit
@@ -8,7 +8,7 @@ class Lidar:
     def __init__(self, robot):
         self.checkB = True
         self.checkF = True
-        self.robot = RobotControl()
+        self.robot = robot
         self.lidar = PyRPlidar()
 
 
