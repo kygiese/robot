@@ -100,7 +100,7 @@ class Lidar:
                         else:
                             tempB = False
 
-                print(self.checkF + "   " + self.checkB)
+                print("Front: ", self.checkF, " Back: ", self.checkB)
 
                 #if not scan.quality == 0:
                     #print(self.checkF, self.checkB)
