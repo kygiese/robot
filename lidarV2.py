@@ -1,4 +1,5 @@
 from pyrplidar import PyRPlidar
+from robot_control import RobotControl
 from math import floor
 import time
 import atexit
@@ -7,7 +8,7 @@ class Lidar:
     def __init__(self, robot):
         self.checkB = True
         self.checkF = True
-        self.robot = robot
+        self.robot = RobotControl()
         self.lidar = PyRPlidar()
 
 
@@ -75,7 +76,8 @@ class Lidar:
                     if scan.distance < 600 and scan.quality > 0:
                         if tempF:
                             self.checkF = True
-                            self.robot.stop()
+                            if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
+                                self.robot.drive(0, 0)
                         else:
                             tempF = True
                     else:
@@ -87,7 +89,8 @@ class Lidar:
                     if scan.distance < 600 and scan.quality > 0:
                         if tempB:
                             self.checkB = True
-                            self.robot.stop()
+                            if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
+                             self.robot.drive(0, 0)
                         else:
                             tempB = True
                     else:

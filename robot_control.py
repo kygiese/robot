@@ -122,6 +122,8 @@ class RobotControl:
         Args:
             mock_mode: If True, use mock controllers. If None, auto-detect.
         """
+        self.currentSpeedL = 0
+        self.currentSpeedR = 0
         self._lock = threading.Lock()
         self._mock_mode = mock_mode if mock_mode is not None else MOCK_MODE
         
@@ -178,6 +180,9 @@ class RobotControl:
                 print("-============================")
                 print(self._lidar.checkB)
                 print(self._lidar.checkF)
+
+                self.currentSpeedR = 0
+                self.currentSpeedL = 0
             
             # Set to neutral/center position
             self.stop()
@@ -205,7 +210,7 @@ class RobotControl:
             with self._lock:
                 elapsed = time.time() - self._last_command_time
                 print("Front: " , self._lidar.checkF , " Back: " , self._lidar.checkB)
-                if elapsed > self._heartbeat_timeout or self._lidar.checkB or self._lidar.checkF:
+                if elapsed > self._heartbeat_timeout:
                     # No recent commands - stop wheels for safety
                     if self._left_wheel_speed != 0 or self._right_wheel_speed != 0:
                         self._set_wheel_speeds_internal(0, 0)
@@ -341,20 +346,16 @@ class RobotControl:
         # Simple mixing: left = y + x, right = y - x
         left_speed = -y - x
         right_speed = y - x
-        
+
+        self.currentSpeedR = right_speed
+        self.currentSpeedL = left_speed
+
         # Normalize if values exceed limits
         max_val = max(abs(left_speed), abs(right_speed))
         if max_val > 100:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
 
-        if self._lidar.checkF and left_speed < 0 < right_speed:
-            return self.drive(0,0)
-        elif self._lidar.checkB and left_speed > 0 > right_speed:
-            return self.drive(0,0)
-        else:
-            return self.drive(left_speed, right_speed)
-    
     def head_pan(self, position):
         """
         Control head pan (left/right rotation).
