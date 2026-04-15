@@ -356,6 +356,10 @@ class RobotControl:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
 
+        with self._lock:
+            self._last_command_time = time.time()
+            self._set_wheel_speeds_internal(left_speed, right_speed)
+
     def head_pan(self, position):
         """
         Control head pan (left/right rotation).
