@@ -17,7 +17,9 @@ class Lidar:
         # Linux   : "/dev/ttyUSB0"
         # MacOS   : "/dev/cu.SLAB_USBtoUART"
         # Windows : "COM5"
-        self.lidar.reset()
+        self.lidar.set_motor_pwm(500)
+        time.sleep(2)
+        self.lidar.set_motor_pwm(0)
         info = self.lidar.get_info()
         print("info :", info)
 
