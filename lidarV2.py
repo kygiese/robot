@@ -57,7 +57,7 @@ class Lidar:
 
     def lidar_scan(self):
         print("1-----------------------------------------")
-        self.lidar.connect(port="/dev/ttyUSB0", baudrate=256000, timeout=3)
+        self.lidar.connect(port="/dev/ttyUSB0", baudrate=1152000, timeout=3)
         print("2-----------------------------------------")
         self.lidar.set_motor_pwm(500)
         print("3-----------------------------------------")
