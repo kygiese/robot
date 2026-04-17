@@ -255,7 +255,7 @@ class RobotControl:
         """Internal method to set wheel speeds (must hold lock)"""
         self._left_wheel_speed = left_speed
         self._right_wheel_speed = right_speed
-        
+
         left_servo = self._speed_to_servo(left_speed)
         right_servo = self._speed_to_servo(right_speed)
         
@@ -315,6 +315,9 @@ class RobotControl:
         """
         left_speed = self._validate_speed(left_speed)
         right_speed = self._validate_speed(right_speed)
+
+        self.currentSpeedR = right_speed
+        self.currentSpeedL = left_speed
         
         with self._lock:
             self._last_command_time = time.time()
