@@ -13,27 +13,26 @@ class Lidar:
 
 
     def get_info(self):
-        lidar = PyRPlidar()
-        lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
+        self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
         # Linux   : "/dev/ttyUSB0"
         # MacOS   : "/dev/cu.SLAB_USBtoUART"
         # Windows : "COM5"
 
-        info = lidar.get_info()
+        info = self.lidar.get_info()
         print("info :", info)
 
-        health = lidar.get_health()
+        health = self.lidar.get_health()
         print("health :", health)
 
-        samplerate = lidar.get_samplerate()
+        samplerate = self.lidar.get_samplerate()
         print("samplerate :", samplerate)
 
-        scan_modes = lidar.get_scan_modes()
+        scan_modes = self.lidar.get_scan_modes()
         print("scan modes :")
         for scan_mode in scan_modes:
             print(scan_mode)
 
-        lidar.disconnect()
+        self.lidar.disconnect()
 
     def simple_scan(self):
         lidar = PyRPlidar()
