@@ -359,6 +359,14 @@ class RobotControl:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
 
+        if left_speed > 0 > right_speed and self._lidar.checkF:
+            left_speed = 0
+            right_speed = 0
+
+        if left_speed < 0 < right_speed and self._lidar.checkB:
+            left_speed = 0
+            right_speed = 0
+
         with self._lock:
             self._last_command_time = time.time()
             self._set_wheel_speeds_internal(left_speed, right_speed)
@@ -500,6 +508,7 @@ class RobotControl:
                 component.controller.close()
             elif hasattr(component, 'motor') and hasattr(component.motor, 'close'):
                 component.motor.close()
+
 
 
 # Singleton instance for easy access
