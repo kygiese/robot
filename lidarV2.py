@@ -86,12 +86,12 @@ class Lidar:
                 # self.checkB = False
 
                 if 260 < scan.angle < 280:
-                    if 0 < scan.distance < 200:
+                    if 0 < scan.distance < 600:
                         self.checkF = True
                     else:
                         self.checkF = False
 
-                if 100 < scan.angle < 160:
+                if 120 < scan.angle < 140:
                     if 0 < scan.distance < 600:
                         self.checkB = True
                     else:
