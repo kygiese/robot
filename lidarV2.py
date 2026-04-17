@@ -48,7 +48,7 @@ class Lidar:
 
         for count, scan in enumerate(scan_generator()):
             print(count, scan)
-            if count == 50: break
+            if count == 200: break
 
         lidar.stop()
         lidar.set_motor_pwm(0)
