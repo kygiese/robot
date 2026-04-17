@@ -13,7 +13,7 @@ class Lidar:
 
 
     def get_info(self):
-        self.lidar.connect(port="/dev/ttyUSB0", baudrate=25600, timeout=3)
+        self.lidar.connect(port="/dev/ttyUSB0", baudrate=256000, timeout=3)
         # Linux   : "/dev/ttyUSB0"
         # MacOS   : "/dev/cu.SLAB_USBtoUART"
         # Windows : "COM5"
