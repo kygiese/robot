@@ -65,6 +65,7 @@ class Lidar:
         print("4-----------------------------------------")
 
         scan_generator = self.lidar.force_scan()
+        print("5------------------")
         scan_data = [0] * 360
 
         try:
