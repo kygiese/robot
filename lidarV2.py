@@ -5,7 +5,7 @@ import time
 import atexit
 
 class Lidar:
-    def __init__(self, robot):
+    def __init__(self, robot=None):
         self.checkB = True
         self.checkF = True
         self.robot = robot
@@ -68,6 +68,9 @@ class Lidar:
         scan_data = [0] * 360
         tempF = False
         tempB = False
+
+        countF = 0
+        countB = 0
 
         try:
             for count, scan in enumerate(scan_generator()):
