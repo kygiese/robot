@@ -61,7 +61,7 @@ class Lidar:
         print("2-----------------------------------------")
         self.lidar.set_motor_pwm(500)
         print("3-----------------------------------------")
-        #time.sleep(2)
+        time.sleep(2)
         print("4-----------------------------------------")
 
         scan_generator = self.lidar.force_scan()
