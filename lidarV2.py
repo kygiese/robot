@@ -19,7 +19,7 @@ class Lidar:
         # Windows : "COM5"
         self.lidar.set_motor_pwm(500)
         time.sleep(2)
-        self.lidar.stop()
+
         self.lidar.set_motor_pwm(0)
 
         self.lidar.disconnect()
