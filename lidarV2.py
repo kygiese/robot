@@ -9,7 +9,6 @@ class Lidar:
         self.checkB = True
         self.checkF = True
         self.robot = robot
-        self.lidar = PyRPlidar()
 
 
     def get_info(self):
@@ -56,6 +55,7 @@ class Lidar:
         lidar.disconnect()
 
     def lidar_scan(self):
+        lidar = PyRPlidar()
         print("1-----------------------------------------")
         self.lidar.connect(port="/dev/ttyUSB0", baudrate=1152000, timeout=3)
         print("2-----------------------------------------")
@@ -64,7 +64,7 @@ class Lidar:
         time.sleep(2)
         print("4-----------------------------------------")
 
-        scan_generator = self.lidar.force_scan()
+        scan_generator = lidar.force_scan()
         print("5------------------")
         scan_data = [0] * 360
 
@@ -92,9 +92,9 @@ class Lidar:
                     #print(self.checkF, self.checkB)
 
         except KeyboardInterrupt:
-            self.lidar.stop()
-            self.lidar.set_motor_pwm(0)
-            self.lidar.disconnect()
+            lidar.stop()
+            lidar.set_motor_pwm(0)
+            lidar.disconnect()
 
     def shutdown(self):
         self.lidar.stop()
