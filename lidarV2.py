@@ -84,7 +84,7 @@ class Lidar:
                     self.checkB = False
                     self.checkF = False
 
-                print("Front: ", self.checkF, " Back: ", self.checkB, self.robot.currentSpeedL, self.robot.currentSpeedR)
+                #print("Front: ", self.checkF, " Back: ", self.checkB, self.robot.currentSpeedL, self.robot.currentSpeedR)
 
 
 
