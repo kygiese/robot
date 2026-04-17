@@ -13,11 +13,16 @@ class Lidar:
 
 
     def get_info(self):
-        self.lidar.connect(port="/dev/ttyUSB0", baudrate=256000, timeout=3)
+        self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
         # Linux   : "/dev/ttyUSB0"
         # MacOS   : "/dev/cu.SLAB_USBtoUART"
         # Windows : "COM5"
+        self.lidar.set_motor_pwm(500)
+        time.sleep(2)
+        self.lidar.stop()
+        self.lidar.set_motor_pwm(0)
 
+        self.lidar.disconnect()
         info = self.lidar.get_info()
         print("info :", info)
 
@@ -120,3 +125,4 @@ class Lidar:
 if __name__ == "__main__":
     lidar = Lidar()
     lidar.simple_scan()
+
