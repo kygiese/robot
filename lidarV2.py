@@ -66,42 +66,24 @@ class Lidar:
 
         scan_generator = self.lidar.force_scan()
         scan_data = [0] * 360
-        tempF = False
-        tempB = False
-
-        countF = 0
-        countB = 0
 
         try:
             for count, scan in enumerate(scan_generator()):
                 scan_data[min([359, floor(scan.angle)])] = scan.distance
-                if 240 < scan.angle < 300 and scan.quality > 0:
-                    if scan.distance < 600:
-                        if tempF:
-                            self.checkF = True
-                            if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
-                               self.robot.drive(0, 0)
-                        else:
-                            tempF = True
-                    else:
-                        if not tempF:
-                            self.checkF = False
-                        else:
-                            tempF = False
+                if 240 < scan.angle < 300 and scan.quality > 0 and scan.distance < 600:
 
-                elif 100 < scan.angle < 160 and scan.quality > 0:
-                    if scan.distance < 600:
-                        if tempB:
-                            self.checkB = True
-                            if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
-                             self.robot.drive(0, 0)
-                        else:
-                            tempB = True
-                    else:
-                        if not tempB:
-                            self.checkB = False
-                        else:
-                            tempB = False
+                    if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
+                        self.robot.drive(0, 0)
+                        self.checkF = True
+
+
+                elif 100 < scan.angle < 160 and scan.quality > 0 and scan.distance < 600:
+                    if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
+                        self.robot.drive(0, 0)
+                        self.checkB = True
+
+                else:
+                    self.checkB = False
 
                 print("Front: ", self.checkF, " Back: ", self.checkB)
 
