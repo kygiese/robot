@@ -359,11 +359,11 @@ class RobotControl:
             left_speed = (left_speed / max_val) * 100
             right_speed = (right_speed / max_val) * 100
 
-        if left_speed > 0 > right_speed and self._lidar.checkF:
+        if left_speed < 0 < right_speed and self._lidar.checkF:
             left_speed = 0
             right_speed = 0
 
-        if left_speed < 0 < right_speed and self._lidar.checkB:
+        if left_speed > 0 < right_speed and self._lidar.checkB:
             left_speed = 0
             right_speed = 0
 
