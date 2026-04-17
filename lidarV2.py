@@ -74,20 +74,20 @@ class Lidar:
                 if 240 < scan.angle < 300 and scan.quality > 0 and scan.distance < 600 and self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
                     self.robot.drive(0, 0)
                     self.checkF = True
-
+                    print("run")
                 else:
                     self.checkF = False
+                    print("--------------")
 
                 if 100 < scan.angle < 160 and scan.quality > 0 and scan.distance < 600 and self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
                     self.robot.drive(0, 0)
                     self.checkB = True
-
                 else:
                     self.checkB = False
 
              #   if(scan.angle > 260 and scan.angle < 270):
               #      print(scan.distance)
-                print("Front: ", self.checkF, " Back: ", self.checkB, self.robot.currentSpeedL, self.robot.currentSpeedR)
+                #print("Front: ", self.checkF, " Back: ", self.checkB, self.robot.currentSpeedL, self.robot.currentSpeedR)
 
 
 
