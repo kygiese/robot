@@ -5,7 +5,7 @@ import time
 import atexit
 
 class Lidar:
-    def __init__(self, robot=None):
+    def __init__(self, robot):
         self.checkB = True
         self.checkF = True
         self.robot = robot
@@ -13,48 +13,47 @@ class Lidar:
 
 
     def get_info(self):
-        self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
+        lidar = PyRPlidar()
+        lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
         # Linux   : "/dev/ttyUSB0"
         # MacOS   : "/dev/cu.SLAB_USBtoUART"
         # Windows : "COM5"
-        self.lidar.set_motor_pwm(500)
-        time.sleep(2)
-        self.lidar.set_motor_pwm(0)
-        info = self.lidar.get_info()
+
+        info = lidar.get_info()
         print("info :", info)
 
-        health = self.lidar.get_health()
+        health = lidar.get_health()
         print("health :", health)
 
-        samplerate = self.lidar.get_samplerate()
+        samplerate = lidar.get_samplerate()
         print("samplerate :", samplerate)
 
-        scan_modes = self.lidar.get_scan_modes()
+        scan_modes = lidar.get_scan_modes()
         print("scan modes :")
         for scan_mode in scan_modes:
             print(scan_mode)
 
-        self.lidar.disconnect()
+        lidar.disconnect()
 
     def simple_scan(self):
+        lidar = PyRPlidar()
 
+        lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
 
-        self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
-
-        self.lidar.set_motor_pwm(500)
+        lidar.set_motor_pwm(500)
 
         time.sleep(2)
 
-        scan_generator = self.lidar.force_scan()
+        scan_generator = lidar.force_scan()
 
         for count, scan in enumerate(scan_generator()):
             print(count, scan)
             if count == 20: break
 
-        self.lidar.stop()
-        self.lidar.set_motor_pwm(0)
+        lidar.stop()
+        lidar.set_motor_pwm(0)
 
-        self.lidar.disconnect()
+        lidar.disconnect()
 
     def lidar_scan(self):
         print("1-----------------------------------------")
