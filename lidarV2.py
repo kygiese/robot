@@ -67,7 +67,7 @@ class Lidar:
         scan_generator = self.lidar.force_scan()
         print("5------------------")
         scan_data = [0] * 360
-
+        count = 0
         try:
             for count, scan in enumerate(scan_generator()):
                 scan_data[min([359, floor(scan.angle)])] = scan.distance
@@ -85,8 +85,9 @@ class Lidar:
 
                 else:
                     self.checkB = False
-
-                print("Front: ", self.checkF, " Back: ", self.checkB)
+                    self.checkF = False
+                count = count+1
+                print("Front: ", self.checkF, " Back: ", self.checkB, count)
 
                 #if not scan.quality == 0:
                     #print(self.checkF, self.checkB)
