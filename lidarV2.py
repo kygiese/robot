@@ -10,7 +10,7 @@ forward_right = 1
 
 def average(scan_data):
     s = 0
-    i = 0
+    i = 1
     for data in scan_data:
         if data > 0:
             s += data
