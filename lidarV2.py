@@ -109,7 +109,7 @@ class Lidar:
             # -------------------------------------------------------------
 
 
-                if count % 360 == 0:
+                if count % 360 == 0 and count > 1:
                     self.right = average(scan_data[175:185])
                     self.right_front = average(scan_data[125:135])
                     self.right_back = average(scan_data[225:235])
