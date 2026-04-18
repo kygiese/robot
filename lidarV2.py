@@ -7,6 +7,17 @@ import atexit
 forward_left = -1
 forward_right = 1
 
+
+def average(scan_data):
+    s = 0
+    i = 0
+    for data in scan_data:
+        if data > 0:
+            s += data
+            i += 1
+    return s / i
+
+
 class Lidar:
     def __init__(self, robot):
         self.right_back = []
@@ -96,12 +107,10 @@ class Lidar:
                     else:
                         self.checkB = False
 
-            #---------------------------------------------
-
-                if count == 360:
-                    self.right = sum(scan_data[175:185])/10
-                    self.right_front = sum(scan_data[125:135])/10
-                    self.right_back = sum(scan_data[225:235])/10
+                if count % 360 == 0:
+                    self.right = average(scan_data[175:185])
+                    self.right_front = average(scan_data[125:135])
+                    self.right_back = average(scan_data[225:235])
 
                     #in zone, go forward
                     if 500 < self.right < 1000:
@@ -133,7 +142,9 @@ class Lidar:
         self.lidar.disconnect()
 
 
-
 if __name__ == "__main__":
     lidar = Lidar()
     lidar.simple_scan()
+
+
+
