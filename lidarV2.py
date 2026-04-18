@@ -81,14 +81,16 @@ class Lidar:
                 if 260 < scan.angle < 280:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
-                            self.checkF = True
+                            self.robot.drive_joystick(0, 0)
+                        self.checkF = True
                     else:
                         self.checkF = False
 
                 if 120 < scan.angle < 140:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
-                            self.checkB = True
+                            self.robot.drive_joystick(0, 0)
+                        self.checkB = True
 
                     else:
                         self.checkB = False
