@@ -27,6 +27,7 @@
                 </label>
             </div>
             <button class="stop-btn" id="stopBtn" onclick="emergencyStop()">⚠️ STOP</button>
+            <button class="stop-btn" id="stopBtn" onclick="wallFollow()">Wall Follow</button>
         </div>
         
         <!-- Drive Control Section -->
@@ -428,9 +429,9 @@
             }
         }
         
-        // ============== Emergency Stop ==============
-        function emergencyStop() {
-            log('EMERGENCY STOP triggered!', 'error');
+        // ============== Wall Follow ==============
+        function wallFollow() {
+            log('All in all its just a', 'success');
             
             // Reset joystick state
             currentJoyX = 0;
@@ -443,17 +444,17 @@
             document.getElementById('speedVal').textContent = '0%';
             
             // Send stop command
-            apiPost('/api/stop', {})
+            apiPost('/api/wallFollow', {})
                 .then(result => {
                     if (result.status === 'ok') {
-                        log('Robot stopped successfully', 'success');
+                        log('another brick in the wall', 'success');
                     }
                 })
                 .catch(() => {
                     log('Stop command may have failed!', 'error');
                 });
         }
-        
+
         // ============== Page Lifecycle ==============
         
         // Handle page refresh/close - send stop command

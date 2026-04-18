@@ -218,6 +218,18 @@ def api_stop():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route("/api/wallFollow", methods=["POST"])
+def api_stop():
+    """
+    Emergency stop endpoint.
+    Sets all motors to neutral/stopped state.
+    """
+    try:
+        result = get_robot().wallFollow()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 @app.route("/api/heartbeat", methods=["POST"])
 def api_heartbeat():

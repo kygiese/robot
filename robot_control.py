@@ -301,6 +301,32 @@ class RobotControl:
             self._arm.center()
         
         return {"status": "ok", "message": "Robot stopped"}
+
+    def wallFollow(self):
+        """
+        STOP - Set all motors to neutral/stopped state.
+        This is the safe state for the robot.
+        """
+        with self._lock:
+            self._last_command_time = time.time()
+
+            # Stop wheels using wheel component
+            self._set_wheel_speeds_internal(0, 0)
+
+            # Center head using head component
+            self._head_pan_pos = 0
+            self._head_tilt_pos = 0
+            self._head.center()
+
+            # Center waist using waist component
+            self._waist_pos = 0
+            self._waist_component.turn(SERVO_CENTER)
+
+            # Center arms using arm component
+            self._arm_pos = 0
+            self._arm.center()
+
+        return {"status": "ok", "message": ""}
     
     def drive(self, left_speed, right_speed):
         """
