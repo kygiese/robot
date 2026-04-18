@@ -1,0 +1,48 @@
+    def lidar_scan(self, follow):
+        print("1-----------------------------------------")
+        self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
+        print("2-----------------------------------------")
+        self.lidar.set_motor_pwm(500)
+        print("3-----------------------------------------")
+        time.sleep(2)
+        print("4-----------------------------------------")
+
+        scan_generator = self.lidar.force_scan()
+        print("5------------------")
+        scan_data = [0] * 360
+        count = 0
+        try:
+            for count, scan in enumerate(scan_generator()):
+                scan_data[min([359, floor(scan.angle)])] = scan.distance
+
+
+                if 260 < scan.angle < 280:
+                    if 0 < scan.distance < 600:
+                        if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
+                            self.robot.drive(0,0)
+                        self.checkF = True
+                    else:
+                        self.checkF = False
+
+                if 120 < scan.angle < 140:
+                    if 0 < scan.distance < 600:
+                        if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
+                            self.robot.drive(0, 0)
+                        self.checkB = True
+
+                    else:
+                        self.checkB = False
+
+                self.right_front = scan_data[200:240]
+                self.right = scan_data[160:200]
+                self.right_back = scan_data[120:160]
+             #   if(scan.angle > 260 and scan.angle < 270):
+              #      print(scan.distance)
+                print("Front: ", self.checkF, " Back: ", self.checkB)
+
+
+
+        except KeyboardInterrupt:
+            self.lidar.stop()
+            self.lidar.set_motor_pwm(0)
+            self.lidar.disconnect()

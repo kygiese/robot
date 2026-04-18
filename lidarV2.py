@@ -4,10 +4,16 @@ from math import floor
 import time
 import atexit
 
+forward_left = -1
+forward_right = 1
+
 class Lidar:
     def __init__(self, robot):
+        self.right_back = []
         self.checkB = True
         self.checkF = True
+        self.right_front = []
+        self.right = []
         self.robot = robot
         self.lidar = PyRPlidar()
 
@@ -55,7 +61,7 @@ class Lidar:
 
         lidar.disconnect()
 
-    def lidar_scan(self):
+    def lidar_scan(self, follow):
         print("1-----------------------------------------")
         self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
         print("2-----------------------------------------")
@@ -71,42 +77,46 @@ class Lidar:
         try:
             for count, scan in enumerate(scan_generator()):
                 scan_data[min([359, floor(scan.angle)])] = scan.distance
-              #  if 240 < scan.angle < 300 and scan.quality > 0 and scan.distance < 600 and self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
-               #     self.robot.drive(0, 0)
-                #    self.checkF = True
-                 #   print("run")
-               # else:
-               #     self.checkF = False
-               #     print("--------------")
-
-               # if 100 < scan.angle < 160 and scan.quality > 0 and scan.distance < 600 and self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
-                #    self.robot.drive(0, 0)
-                #    self.checkB = True
-               # else:
-                # self.checkB = False
 
                 if 260 < scan.angle < 280:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
-                            self.robot.drive(0,0)
-                        self.checkF = True
+                            self.checkF = True
                     else:
                         self.checkF = False
 
                 if 120 < scan.angle < 140:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
-                            self.robot.drive(0, 0)
-                        self.checkB = True
+                            self.checkB = True
 
                     else:
                         self.checkB = False
 
-             #   if(scan.angle > 260 and scan.angle < 270):
-              #      print(scan.distance)
+                if count == 360:
+                    self.right = sum(scan_data[175:185])/10
+                    self.right_front = sum(scan_data[125:135])/10
+                    self.right_back = sum(scan_data[225:235])/10
+
+                    #in zone, go forward
+                    if 500 < self.right < 1000:
+                        self.robot.drive_joystick(50, 50)
+
+                    #not in zone
+                    else:
+                        #turn towards wall
+                        if self.right_front > self.right_back:
+                            self.robot.drive_joystick(-50, 50)
+                        #turn away from wall
+                        else:
+                            self.robot.drive_joystick(50, -50)
+
+
+
                 print("Front: ", self.checkF, " Back: ", self.checkB)
 
 
+    def
 
         except KeyboardInterrupt:
             self.lidar.stop()
