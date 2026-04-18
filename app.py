@@ -220,7 +220,7 @@ def api_stop():
 
 
 @app.route("/api/wallFollow", methods=["POST"])
-def api_stop():
+def api_wallFollow():
 
     try:
         result = get_robot().wallFollow()
