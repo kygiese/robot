@@ -106,6 +106,8 @@ class Lidar:
 
                     else:
                         self.checkB = False
+            # -------------------------------------------------------------
+                
 
                 if count % 360 == 0:
                     self.right = average(scan_data[175:185])
