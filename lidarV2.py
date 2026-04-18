@@ -72,7 +72,7 @@ class Lidar:
 
         lidar.disconnect()
 
-    def lidar_scan(self, follow):
+    def lidar_scan(self):
         print("1-----------------------------------------")
         self.lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
         print("2-----------------------------------------")
