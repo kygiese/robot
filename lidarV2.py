@@ -89,6 +89,7 @@ class Lidar:
             for count, scan in enumerate(scan_generator()):
                 scan_data[min([359, floor(scan.angle)])] = scan.distance
 
+            #-------------------------------------------------------------
                 if 260 < scan.angle < 280:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
@@ -105,6 +106,8 @@ class Lidar:
 
                     else:
                         self.checkB = False
+            # -------------------------------------------------------------
+
 
                 if count % 360 == 0:
                     self.right = average(scan_data[175:185])

@@ -429,9 +429,9 @@
             }
         }
         
-        // ============== Wall Follow ==============
-        function wallFollow() {
-            log('All in all its just a', 'success');
+        // ============== Emergency Stop ==============
+        function emergencyStop() {
+            log('EMERGENCY STOP triggered!', 'error');
             
             // Reset joystick state
             currentJoyX = 0;
@@ -444,6 +444,32 @@
             document.getElementById('speedVal').textContent = '0%';
             
             // Send stop command
+            apiPost('/api/stop', {})
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log('Robot stopped successfully', 'success');
+                    }
+                })
+                .catch(() => {
+                    log('Stop command may have failed!', 'error');
+                });
+        }
+
+        // ============== Wall Follow ==============
+        function wallFollow() {
+            log('All in all its just a', 'success');
+
+            // Reset joystick state
+            currentJoyX = 0;
+            currentJoyY = 0;
+
+            // Reset UI
+            document.getElementById('leftSpeed').textContent = '0';
+            document.getElementById('rightSpeed').textContent = '0';
+            document.getElementById('direction').textContent = 'C';
+            document.getElementById('speedVal').textContent = '0%';
+
+            // Send stop command
             apiPost('/api/wallFollow', {})
                 .then(result => {
                     if (result.status === 'ok') {
@@ -451,7 +477,7 @@
                     }
                 })
                 .catch(() => {
-                    log('Stop command may have failed!', 'error');
+                    log('command may have failed!', 'error');
                 });
         }
 
