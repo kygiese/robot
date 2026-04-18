@@ -116,7 +116,6 @@ class Lidar:
                 print("Front: ", self.checkF, " Back: ", self.checkB)
 
 
-    def
 
         except KeyboardInterrupt:
             self.lidar.stop()
@@ -127,6 +126,7 @@ class Lidar:
         self.lidar.stop()
         self.lidar.set_motor_pwm(0)
         self.lidar.disconnect()
+
 
 
 if __name__ == "__main__":
