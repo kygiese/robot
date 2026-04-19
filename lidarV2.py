@@ -20,13 +20,18 @@ def average(scan_data):
 
 class Lidar:
     def __init__(self, robot):
-        self.right_back = []
+        self.right_back = 0
         self.checkB = True
         self.checkF = True
-        self.right_front = []
-        self.right = []
+        self.right_front = 0
+        self.right = 0
         self.robot = robot
         self.lidar = PyRPlidar()
+        self.follow = "right"
+        self.left = 0
+        self.left_back = 0
+        self.left_front = 0
+
 
 
     def get_info(self):
@@ -93,7 +98,7 @@ class Lidar:
                 if 260 < scan.angle < 280:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
-                            self.robot.drive_joystick(0, 0)
+                            self.robot.drive(0, 0)
                         self.checkF = True
                     else:
                         self.checkF = False
@@ -101,7 +106,7 @@ class Lidar:
                 if 120 < scan.angle < 140:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
-                            self.robot.drive_joystick(0, 0)
+                            self.robot.drive(0, 0)
                         self.checkB = True
 
                     else:
@@ -109,27 +114,47 @@ class Lidar:
             # -------------------------------------------------------------
 
 
-                if count % 360 == 0 and count > 1:
+                if count % 360 == 0 and count > 1 and self.follow is not None:
+                    #if self.follow == "right":
                     self.right = average(scan_data[175:185])
-                    self.right_front = average(scan_data[125:135])
-                    self.right_back = average(scan_data[225:235])
+                    self.right_back = average(scan_data[125:135])
+                    self.right_front = average(scan_data[225:235])
 
                     #in zone, go forward
-                    if 500 < self.right < 1000:
-                        self.robot.drive_joystick(50, 50)
+                    if 500 < self.right < 700:
+                        self.robot.drive_joystick(0, 50)
 
                     #not in zone
                     else:
                         #turn towards wall
                         if self.right_front > self.right_back:
-                            self.robot.drive_joystick(-50, 50)
+                            self.robot.drive_joystick(-25, 25)
                         #turn away from wall
                         else:
-                            self.robot.drive_joystick(50, -50)
+                            self.robot.drive_joystick(25, 25)
 
+                '''
+                    if self.follow == "left":
+                        self.left = average(scan_data[355:5])
+                        self.left_back = average(scan_data[45:55])
+                        self.left_front = average(scan_data[305:315])
 
+                    # in zone, go forward
+                        if 500 < self.left < 700:
+                            self.robot.drive_joystick(0, 50)
 
-                print("Front: ", self.checkF, " Back: ", self.checkB)
+                    # not in zone
+                        else:
+                        # turn towards wall
+                            if self.left_front > self.left_back:
+                                self.robot.drive_joystick(25, 25)
+                        # turn away from wall
+                            else:
+                                self.robot.drive_joystick(-25, 25)
+
+                '''
+                #print("Front: ", self.checkF, " Back: ", self.checkB)
+                print(self.right)
 
 
 
