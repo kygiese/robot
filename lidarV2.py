@@ -4,6 +4,8 @@ from math import floor
 import time
 import atexit
 
+import wall_follow
+
 forward_left = -1
 forward_right = 1
 
@@ -115,6 +117,11 @@ class Lidar:
 
 
                 if count % 360 == 0 and count > 1 and self.follow is not None:
+
+                    left_speed, right_speed = wall_follow.find_speeds(scan_data, 25)
+                    self.robot.drive_joystick(left_speed, right_speed)
+
+                    '''
                     #if self.follow == "right":
                     self.right = average(scan_data[175:185])
                     self.right_back = average(scan_data[125:135])
@@ -132,7 +139,7 @@ class Lidar:
                         #turn away from wall
                         else:
                             self.robot.drive_joystick(25, 25)
-
+                    '''
                 '''
                     if self.follow == "left":
                         self.left = average(scan_data[355:5])
@@ -154,7 +161,7 @@ class Lidar:
 
                 '''
                 #print("Front: ", self.checkF, " Back: ", self.checkB)
-                print(self.right)
+               # print(self.right)
 
 
 
