@@ -25,6 +25,7 @@ class Lidar:
         self.right_back = 0
         self.checkB = True
         self.checkF = True
+
         self.right_front = 0
         self.right = 0
         self.robot = robot
