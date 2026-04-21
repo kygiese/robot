@@ -7,17 +7,17 @@ def find_speeds(scan_data, default_speed):
     i = 255
     while scan_data[i] == 0:
         i += 1
-    x1 = scan_data[i]*math.cos(i)
-    y1 = scan_data[i]*math.sin(i)
+    x1 = scan_data[i]*math.cos(math.radians(i))
+    y1 = scan_data[i]*math.sin(math.radians(i))
     i = 135
     while scan_data[i] == 0:
         i -= 1
-    x2 = scan_data[i]*math.cos(i)
-    y2 = scan_data[i]*math.sin(i)
+    x2 = scan_data[i]*math.cos(math.radians(i))
+    y2 = scan_data[i]*math.sin(math.radians(i))
 
     m = (y1-y2)/(x1-x2)
 
-    b = m*x1 + y1
+    b = y1 - (m*x1)
 
     target_y = 500
     target_x = (target_y-b)/m
