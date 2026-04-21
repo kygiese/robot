@@ -17,6 +17,9 @@
                 <div class="status-dot" id="statusDot"></div>
                 <span id="statusText">Connecting...</span>
             </div>
+
+            <!-- this switches between slider mode that only sends commands on release and active
+
             <div class="control-mode">
                 <label class="switch-label">
                     <span id="modeLabel">Standard Mode</span>
@@ -26,7 +29,28 @@
                     </label>
                 </label>
             </div>
-            <button class="stop-btn" id="stopBtn" onclick="emergencyStop()">⚠️ STOP</button>
+        -->
+             <div class="follow-mode">
+                <label class="switch-label">
+                    <span id="fmodeLabel">Follow Right</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="followModeToggle" onchange="toggleFollowMode()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </label>
+            </div>
+
+             <div class="follow-on">
+                <label class="switch-label">
+                    <span id="omodeLabel">Follow Off</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="followOnToggle" onchange="toggleFollowOn()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </label>
+            </div>
+
+            <button class="stop-btn" id="stopBtn" onclick="emergencyStop()">STOP</button>
             <button class="stop-btn" id="stopBtn" onclick="wallFollow()">Wall Follow</button>
         </div>
         
@@ -156,7 +180,8 @@
         let heartbeatInterval = null;
         let driveInterval = null;
         let activeMode = false;  // Control mode: false=standard, true=active response
-        
+        let followMode = false;
+        let followOn = false;
         // ============== Debug Logging ==============
         function log(message, type = 'info') {
             const panel = document.getElementById('debugPanel');
@@ -265,21 +290,80 @@
             // Send command immediately on joystick move
             sendDriveCommand();
         });
-        
+
+
         // ============== Control Mode ==============
-        function toggleControlMode() {
-            activeMode = document.getElementById('activeModeToggle').checked;
-            const modeLabel = document.getElementById('modeLabel');
+     //   function toggleControlMode() {
+       //     activeMode = document.getElementById('activeModeToggle').checked;
+         //   const modeLabel = document.getElementById('modeLabel');
             
+           // if (activeMode) {
+             //   modeLabel.textContent = 'Active Response';
+               // log('Active Response Mode: Controls respond in real-time', 'success');
+            //} else {
+              //  modeLabel.textContent = 'Standard Mode';
+                //log('Standard Mode: Controls respond when released', 'success');
+            //}
+        //}
+
+         // ============== Follow Modes ==============
+        function toggleFollowMode() {
+            activeMode = document.getElementById('followModeToggle').checked;
+            const modeLabel = document.getElementById('fmodeLabel');
+
             if (activeMode) {
-                modeLabel.textContent = 'Active Response';
-                log('Active Response Mode: Controls respond in real-time', 'success');
+                modeLabel.textContent = 'Follow Left';
+                followMode = true
+                 apiPost('/api/wallFollowMode', { on: followOn, mode: followMode })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log('Follow Target wall: wall following left wall', 'success');
+                    }
+                })
+                .catch(() => {});
+
             } else {
-                modeLabel.textContent = 'Standard Mode';
-                log('Standard Mode: Controls respond when released', 'success');
+                modeLabel.textContent = 'Follow Right';
+                followMode = false
+                 apiPost('/api/wallFollowMode', { on: followOn, mode: followMode })
+                .then(result => {
+                    if (result.status === 'ok') {
+                          log('Follow Target wall: wall following right wall', 'success');
+                    }
+                })
+                .catch(() => {});
             }
         }
-        
+
+         function toggleFollowOn() {
+            activeMode = document.getElementById('followOnToggle').checked;
+            const modeLabel = document.getElementById('omodeLabel');
+
+            if (activeMode) {
+                modeLabel.textContent = 'Follow On';
+                followOn = true
+                apiPost('/api/wallFollowMode', { on: followOn, mode: followMode })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        log('Follow Mode: wall following on', 'success');
+                    }
+                })
+                .catch(() => {});
+
+            } else {
+                modeLabel.textContent = 'Follow Off';
+                followOn = false
+                 apiPost('/api/wallFollowMode', { on: followOn, mode: followMode })
+                .then(result => {
+                    if (result.status === 'ok') {
+                          log('Follow Mode: wall following off', 'success');
+                    }
+                })
+                .catch(() => {});
+
+            }
+        }
+
         // ============== Head Control ==============
         function updatePan(value) {
             document.getElementById('panValue').textContent = value;

@@ -122,6 +122,8 @@ class RobotControl:
         Args:
             mock_mode: If True, use mock controllers. If None, auto-detect.
         """
+        self.FollowMode = None
+        self.FollowOn = None
         self.currentSpeedL = 0
         self.currentSpeedR = 0
         self._lock = threading.Lock()
@@ -327,6 +329,16 @@ class RobotControl:
             self._arm.center()
 
         return {"status": "ok", "message": ""}
+
+    def wallFollowMode(self, follow_on, follow_mode):
+
+        with self._lock:
+            self.FollowOn = follow_on
+            self.FollowMode = follow_mode
+        return {"status": "ok", "message": ""}
+
+
+
     
     def drive(self, left_speed, right_speed):
         """

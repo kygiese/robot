@@ -229,6 +229,23 @@ def api_wallFollow():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route("/api/wallFollowMode", methods=["POST"])
+def api_wallFollowMode():
+
+    try:
+        data = request.get_json()
+        if not data or "on" not in data:
+            return jsonify({"status": "error", "message": "Position required"}), 400
+
+        on = data.get("on", False)
+        direction = data.get("mode", False)
+
+        result = get_robot().wallFollowMode(on, direction)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @app.route("/api/heartbeat", methods=["POST"])
 def api_heartbeat():
     """
