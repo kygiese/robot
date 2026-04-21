@@ -114,10 +114,15 @@ class Lidar:
                         self.checkB = False
             # -------------------------------------------------------------
 
+                if count == 0:
+                    left_speed = 0
+                    right_speed = 0
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
                     left_speed, right_speed = wall_follow.find_speeds(scan_data, -50)
                     self.robot.drive(left_speed, right_speed)
+
+
                     '''
                     #if self.follow == "right":
                     self.right = average(scan_data[175:185])
@@ -157,7 +162,8 @@ class Lidar:
                                 self.robot.drive_joystick(-25, 25)
 
                 '''
-                #print("Front: ", self.checkF, " Back: ", self.checkB)
+
+                print(left_speed, right_speed)
                # print(self.right)
 
 
