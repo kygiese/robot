@@ -29,7 +29,6 @@ class Lidar:
         self.right = 0
         self.robot = robot
         self.lidar = PyRPlidar()
-        self.follow = None
         self.left = 0
         self.left_back = 0
         self.left_front = 0
@@ -116,7 +115,7 @@ class Lidar:
             # -------------------------------------------------------------
 
 
-                if count % 360 == 0 and count > 1 and self.follow is not None:
+                if count % 360 == 0 and count > 1 and self.robot.FollowOn:
 
                     left_speed, right_speed = wall_follow.find_speeds(scan_data, 25)
                     self.robot.drive_joystick(left_speed, right_speed)
