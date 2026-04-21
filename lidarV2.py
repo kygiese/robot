@@ -128,7 +128,7 @@ class Lidar:
                     self.right_front = average(scan_data[225:235])
 
                     #in zone, go forward
-                    if 500 < self.right < 700:
+                    if 700 < self.right < 1100:
                         self.robot.drive_joystick(0, 50)
 
                     #not in zone
