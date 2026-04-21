@@ -25,7 +25,7 @@ def find_speeds(scan_data, default_speed):
 
     ld = math.sqrt(target_x**2 + target_y**2)
 
-    alpha = math.atan2(target_x, target_y)
+    alpha = math.atan2(-target_x, target_y)
 
     r = ld/(2*math.sin(alpha))
 
