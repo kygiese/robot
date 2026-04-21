@@ -31,10 +31,11 @@ def find_speeds(scan_data, default_speed):
 
     r = ld/(2*math.sin(alpha))
 
+    fuckyou = (2* math.sin(alpha) /ld) * default_speed
 
-    right_speed = ((default_speed*r*2) - (w*default_speed))/((r*2)+w)
-
-    return default_speed, right_speed
+    right_speed = default_speed - (fuckyou*w/2)
+    left_speed = default_speed + (fuckyou*w/2)
+    return left_speed, right_speed
 
 
 
