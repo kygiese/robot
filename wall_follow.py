@@ -1,6 +1,6 @@
 import math
 
-w = 10
+w = 372
 
 def find_speeds(scan_data, default_speed):
 
