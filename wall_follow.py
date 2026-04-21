@@ -28,7 +28,7 @@ def find_speeds(scan_data, default_speed):
 
     r = (2*math.sin(alpha))/ld
 
-    print(r)
+    print(alpha)
 
     right_speed = ((default_speed*r*2) - (w*default_speed))/((r*2)+w)
 
