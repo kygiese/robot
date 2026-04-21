@@ -3,10 +3,17 @@ import math
 w = 10
 
 def find_speeds(scan_data, default_speed):
-    x1 = scan_data[225]*math.cos(225)
-    y1 = scan_data[225]*math.sin(225)
-    x2 = scan_data[135]*math.cos(135)
-    y2 = scan_data[135]*math.sin(135)
+
+    i = 255
+    while scan_data[i] == 0:
+        i += 1
+    x1 = scan_data[i]*math.cos(i)
+    y1 = scan_data[i]*math.sin(i)
+    i = 135
+    while scan_data[i] == 0:
+        i -= 1
+    x2 = scan_data[i]*math.cos(i)
+    y2 = scan_data[i]*math.sin(i)
 
     m = (y1-y2)/(x1-x2)
 
