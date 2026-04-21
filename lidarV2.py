@@ -114,9 +114,6 @@ class Lidar:
                         self.checkB = False
             # -------------------------------------------------------------
 
-                if count == 0:
-                    left_speed = 0
-                    right_speed = 0
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
                     left_speed, right_speed = wall_follow.find_speeds(scan_data, -50)
