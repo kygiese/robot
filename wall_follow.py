@@ -14,8 +14,10 @@ def find_speeds(scan_data, default_speed):
         i -= 1
     x2 = scan_data[i]*math.cos(math.radians(i))
     y2 = scan_data[i]*math.sin(math.radians(i))
+
     print(x1,y1)
     print(x2,y2)
+
     m = (y1-y2)/(x1-x2)
 
     b = y1 - (m*x1)
@@ -25,9 +27,9 @@ def find_speeds(scan_data, default_speed):
 
     ld = math.sqrt(target_x**2 + target_y**2)
 
-    alpha = math.atan(m)
+    alpha = math.atan2(target_y, target_x)
 
-    r = (2*math.sin(alpha))/ld
+    r = ld/(2*math.sin(alpha))
 
 
     right_speed = ((default_speed*r*2) - (w*default_speed))/((r*2)+w)
