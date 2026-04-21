@@ -3,7 +3,6 @@ import robot_control
 from math import floor
 import time
 import atexit
-
 import wall_follow
 
 forward_left = -1
@@ -29,7 +28,7 @@ class Lidar:
         self.right = 0
         self.robot = robot
         self.lidar = PyRPlidar()
-        self.follow = "right"
+        self.follow = None
         self.left = 0
         self.left_back = 0
         self.left_front = 0
