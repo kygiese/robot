@@ -160,7 +160,6 @@ class Lidar:
 
                 '''
 
-                print(left_speed, right_speed)
                # print(self.right)
 
 
