@@ -116,10 +116,11 @@ class Lidar:
 
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
-
+                    print("1")
                     left_speed, right_speed = wall_follow.find_speeds(scan_data, 25)
+                    print("2")
                     self.robot.drive_joystick(left_speed, right_speed)
-
+                    print("3")
                     '''
                     #if self.follow == "right":
                     self.right = average(scan_data[175:185])
