@@ -4,7 +4,7 @@ from math import floor
 import time
 import atexit
 import wall_follow
-
+import math
 forward_left = -1
 forward_right = 1
 
@@ -123,22 +123,33 @@ class Lidar:
 
                     '''
                     #if self.follow == "right":
-                    self.right = average(scan_data[175:185])
-                    self.right_back = average(scan_data[125:135])
-                    self.right_front = average(scan_data[225:235])
+                    self.left = average(scan_data[175:185])
+                    self.left_back = average(scan_data[145:155]) #125, 135
+                    self.left_front = average(scan_data[205:215]) #225, 235
 
+                    print (self.left_front, self.left_back)
                     #in zone, go forward
-                    if 700 < self.right < 1100:
-                        self.robot.drive_joystick(0, 50)
-
-                    #not in zone
-                    else:
-                        #turn towards wall
-                        if self.right_front > self.right_back:
-                            self.robot.drive_joystick(-25, 25)
-                        #turn away from wall
+                    if 700 < self.left < 1100:
+                        # proactively adjust curve while in good zone, prevents departure form zone under normal operation
+                        if self.left_front - self.left_back < -100:
+                            self.robot.drive_joystick(15, 50)
+                        if self.left_front - self.left_back > 100:
+                            self.robot.drive_joystick(-15, 50)#
+                        #good zone and angle
                         else:
-                            self.robot.drive_joystick(25, 25)
+                            self.robot.drive_joystick(0, 50)
+
+                    #not in zone/lost wall recovery/corner recovery
+                    #turn away
+                    elif self.left < 700:
+                        self.robot.drive_joystick(25, 25)
+                    #turn towards
+                    elif self.left > 1100:
+                        self.robot.drive_joystick(-25, 25)
+
+                    #coverage check
+                    else:
+                        print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
                 '''
                     if self.follow == "left":
@@ -159,10 +170,9 @@ class Lidar:
                             else:
                                 self.robot.drive_joystick(-25, 25)
 
-                '''
+                    '''
 
                # print(self.right)
-
 
 
         except KeyboardInterrupt:
