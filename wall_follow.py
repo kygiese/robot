@@ -22,8 +22,14 @@ def find_speeds(scan_data, default_speed):
 
     m,b = np.polyfit(x_arr, y_arr, 1)
 
+#----------------- distance calc -------
+    distance = 700 # the wanted distance
+    mesuredDistance = abs(b)/(m**2 +1)
+    distanceTarget = mesuredDistance - distance
+#--------------  ------------ - -- -
+
     target_x = 700
-    target_y = m * target_x + b
+    target_y = (m * target_x + b) - distanceTarget
 
     ld = math.sqrt(target_x**2 + target_y**2)
 
