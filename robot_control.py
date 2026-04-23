@@ -340,7 +340,7 @@ class RobotControl:
 
 
     
-    def drive(self, x, y):
+    def drive(self, left_speed, right_speed):
         """
         Control wheel speeds for driving.
         
@@ -351,14 +351,9 @@ class RobotControl:
         Returns:
             dict with status and actual values used
         """
-        x = self._validate_speed(x)
-        y = self._validate_speed(y)
+        left_speed = self._validate_speed(left_speed)
+        right_speed = self._validate_speed(right_speed)
 
-        # Convert joystick to differential drive
-        # y = forward/backward, x = turning
-        # Simple mixing: left = y + x, right = y - x
-        left_speed = -y - x
-        right_speed = y - x
 
 
         self.currentSpeedR = right_speed
@@ -389,7 +384,9 @@ class RobotControl:
         x = self._validate_speed(x)
         y = self._validate_speed(y)
         
-       
+        # Convert joystick to differential drive
+        # y = forward/backward, x = turning
+        # Simple mixing: left = y + x, right = y - x
         left_speed = -y - x
         right_speed = y - x
 
