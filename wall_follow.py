@@ -4,7 +4,7 @@ w = 394
 
 def find_speeds(scan_data, default_speed):
 
-    i = 255
+    i = 225
     while scan_data[i] == 0:
         i += 1
     x1 = scan_data[i]*math.cos(math.radians(i))
