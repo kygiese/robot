@@ -124,13 +124,20 @@ class Lidar:
                     self.left_back = average(scan_data[145:155]) #125, 135
                     self.left_front = average(scan_data[205:215]) #225, 235
 
-                    print(self.left_front, self.left_back)
+
 
                     # in zone, go forward
-                    if 500 < self.left < 700:
+                    if 700 < self.left < 1100:
                         self.robot.drive_joystick(0, 50)
 
                     # not in zone
+                    elif self.left < 700:
+                        self.robot.drive_joystick(-20, 50)
+
+                    elif self.left > 1100:
+                        self.robot.drive_joystick(20, 50)
+
+                    '''    
                     else:
                         # turn towards wall
                         if self.left_front > self.left_back:
@@ -138,7 +145,7 @@ class Lidar:
                         # turn away from wall
                         else:
                             self.robot.drive_joystick(-25, 25)
-
+                    '''
 
             # print(self.right)
 
