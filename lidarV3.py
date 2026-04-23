@@ -132,10 +132,10 @@ class Lidar:
 
                     # not in zone
                     elif self.left < 700:
-                        self.robot.drive_joystick(25, 25)
+                        self.robot.drive_joystick(10, 25)
 
                     elif self.left > 1100:
-                        self.robot.drive_joystick(-25, 25)
+                        self.robot.drive_joystick(-10, 25)
 
                     '''    
                     else:
