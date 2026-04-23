@@ -21,7 +21,7 @@ def find_speeds(scan_data, default_speed):
     b = y1 - (m*x1)
 
     target_x = 500
-    target_y = (target_x-b)/m
+    target_y = m * target_x + b
 
     ld = math.sqrt(target_x**2 + target_y**2)
 
@@ -33,7 +33,7 @@ def find_speeds(scan_data, default_speed):
 
     vel = (2 * math.sin(alpha) /ld) * default_speed
 
-    right_speed = default_speed + (vel*w/2)
+    right_speed = -(default_speed + (vel*w/2))
     left_speed = default_speed - (vel*w/2)
     return left_speed, right_speed
 
