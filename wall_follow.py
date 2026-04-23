@@ -33,7 +33,7 @@ def find_speeds(scan_data, default_speed):
 
     vel = (2 * math.sin(alpha) /ld) * default_speed
 
-    right_speed = default_speed + (vel*w/2)
+    right_speed = -(default_speed + (vel*w/2))
     left_speed = default_speed - (vel*w/2)
     return left_speed, right_speed
 
