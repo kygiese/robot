@@ -20,8 +20,8 @@ This layer is callable directly from Python for testing.
 import threading
 import time
 import atexit
-import lidarV2 as lidar
-
+#import lidarV2 as lidar
+import lidarV3 as lidar
 # Safe limits for servo positions (quarter-microseconds)
 # Standard servo range is 3000-9000, center at 6000
 SERVO_MIN = 4000
