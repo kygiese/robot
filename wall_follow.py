@@ -1,26 +1,28 @@
 import math
+import numpy as np
 
 w = 394
 
 def find_speeds(scan_data, default_speed):
 
-    i = 255
-    while scan_data[i] == 0:
-        i += 1
-    x1 = scan_data[i]*math.cos(math.radians(i))
-    y1 = scan_data[i]*math.sin(math.radians(i))
-    i = 135
-    while scan_data[i] == 0:
-        i -= 1
-    x2 = scan_data[i]*math.cos(math.radians(i))
-    y2 = scan_data[i]*math.sin(math.radians(i))
+    points = []
 
+    for i in range(120, 240):
+        if scan_data[i] > 0:
+            x = scan_data[i] * math.cos(math.radians(i))
+            y = scan_data[i] * math.sin(math.radians(i))
+            points.append((x, y))
 
-    m = (y1-y2)/(x1-x2)
+    if len(points) < 10:
+        print("bad wall")
+        return default_speed, -default_speed
 
-    b = y1 - (m*x1)
+    x_arr = np.array([p[0] for p in points])
+    y_arr = np.array([p[1] for p in points])
 
-    target_x = 500
+    m,b = np.polyfit(x_arr, y_arr, 1)
+
+    target_x = 700
     target_y = m * target_x + b
 
     ld = math.sqrt(target_x**2 + target_y**2)
@@ -33,9 +35,9 @@ def find_speeds(scan_data, default_speed):
 
     vel = (2 * math.sin(alpha) /ld) * default_speed
 
-    right_speed = -(default_speed + (vel*w/2))
+    right_speed = default_speed + (vel*w/2)
     left_speed = default_speed - (vel*w/2)
-    return left_speed, right_speed
+    return left_speed, -right_speed
 
 
 

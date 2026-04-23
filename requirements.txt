@@ -3,3 +3,4 @@ flask-cors==4.0.0
 pyserial==3.5
 rplidar~=0.9.2
 pyrplidar~=0.1.2
+numpy~=2.4.4
