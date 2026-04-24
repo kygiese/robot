@@ -6,7 +6,6 @@ import atexit
 import wall_follow
 import math
 
-from app import robot
 
 forward_left = -1
 forward_right = 1
