@@ -383,7 +383,7 @@
             if (activeMode) {
                 modeLabel.textContent = 'Guide On';
                 guideOn = true
-                apiPost('/api/guide', {on : guideOn})
+                apiPost('/api/guide', { })
                     .then(result => {
                         if (result.status === 'ok') {
                             log('guide Mode: wall following on', 'success');

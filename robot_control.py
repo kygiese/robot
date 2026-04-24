@@ -185,11 +185,17 @@ class RobotControl:
                 print(self._lidar.checkB)
                 print(self._lidar.checkF)
 
+                guide_engine = RobotGuide(self)
+                guide_engine.guide()
+
                 self.currentSpeedR = 0
                 self.currentSpeedL = 0
-            
+
+
+
             # Set to neutral/center position
             self.stop()
+
 
 
         except Exception as e:
