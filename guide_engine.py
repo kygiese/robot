@@ -76,6 +76,7 @@ class RobotGuide:
 
     def on_aligning_complete(self):
         print("driving...")
+        time.sleep(3)
         self.robot.FollowOn = True
         intersection = False
         while not intersection:
