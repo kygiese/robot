@@ -34,6 +34,7 @@ class Lidar:
         self.left = 0
         self.left_back = 0
         self.left_front = 0
+        self.scan_data = [0] * 360
 
 
 
@@ -91,7 +92,7 @@ class Lidar:
 
         scan_generator = self.lidar.force_scan()
         print("5------------------")
-        scan_data = [0] * 360
+
         count = 0
         try:
             for count, scan in enumerate(scan_generator()):

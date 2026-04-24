@@ -33,7 +33,14 @@ def listen():
     return "bathroom"
 
 
-
+def average(scan_data):
+    s = 0
+    i = 1
+    for data in scan_data:
+        if data > 0:
+            s += data
+            i += 1
+    return s / i
 
 
 class RobotGuide:
@@ -58,7 +65,7 @@ class RobotGuide:
 
     def on_response_detected(self):
         self.robot.drive_joystick(50, 50)
-        time.sleep(1)
+        time.sleep(1.1)
         self.robot.drive_joystick(0, 0)
         print("turning...")
         self.robot_guide_machine.send("turning_around_complete")
@@ -69,11 +76,16 @@ class RobotGuide:
 
     def on_aligning_complete(self):
         print("driving...")
+        self.robot.FollowOn = True
+        intersection = False
+        while not intersection:
+            a = average(self.robot.lidar.scan_data[270:300])
+            intersection = a > 1000
         self.robot_guide_machine.send("intersection_detected")
 
     def on_intersection_detected(self):
-        #self.robot.FollowOn = False
-        #self.robot.stop()
+        self.robot.FollowOn = False
+        self.robot.stop()
         print("turning...")
         self.robot_guide_machine.send("turning_complete")
 
@@ -82,7 +94,7 @@ class RobotGuide:
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
-        #self.tts.speak("We have arrived", None, False)
+        self.tts.speak("We have arrived", None, False)
         print("speaking...")
 
     def guide(self):
