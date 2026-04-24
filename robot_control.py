@@ -343,8 +343,11 @@ class RobotControl:
 
 
     def guide(self):
-        guide_engine = RobotGuide(self)
-        guide_engine.guide()
+        with self._lock:
+            guide_engine = RobotGuide(self)
+            guide_engine.guide()
+        return {"status": "ok", "message": ""}
+
 
 
 
@@ -560,6 +563,7 @@ class RobotControl:
     @property
     def lidar(self):
         return self._lidar
+
 
 
 # Singleton instance for easy access

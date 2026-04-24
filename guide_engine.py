@@ -85,6 +85,7 @@ class RobotGuide:
 
     def guide(self):
         # state 0 waiting for person
+        print("starting..........")
         human_detected = True
         while not human_detected:
             if self.robot.lidar.checkF:
