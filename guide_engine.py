@@ -89,10 +89,15 @@ class RobotGuide:
         self.robot.FollowOn = False
         self.robot.stop()
         print("turning...")
+        self.robot.drive_joystick(50, 50)
+        time.sleep(0.6)
         self.robot_guide_machine.send("turning_complete")
 
     def on_turning_complete(self):
         print("driving...")
+        self.robot.drive_joystick(0, 50)
+        time.sleep(2)
+        self.robot.drive_joystick(0, 0)
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
