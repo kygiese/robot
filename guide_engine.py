@@ -90,7 +90,7 @@ class RobotGuide:
         self.robot.stop()
         print("turning...")
         self.robot.drive_joystick(50, 50)
-        time.sleep(0.6)
+        time.sleep(0.4)
         self.robot_guide_machine.send("turning_complete")
 
     def on_turning_complete(self):
