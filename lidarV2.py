@@ -35,7 +35,7 @@ class Lidar:
         self.left_back = 0
         self.left_front = 0
         self.scan_data = [0] * 360
-
+        self.intersect_flag = False
 
 
     def get_info(self):
@@ -116,7 +116,11 @@ class Lidar:
                     else:
                         self.checkB = False
             # -------------------------------------------------------------
-
+                if scan.angle == 300:
+                    print(scan.distance)
+                    if scan.distance > 1200:
+                        self.intersect_flag = True
+                        print(self.intersect_flag)
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
                     self.robot.FollowMode = True

@@ -78,14 +78,11 @@ class RobotGuide:
         print("driving...")
 
         self.robot.FollowOn = True
-        '''
         intersection = False
         while not intersection:
-            a = average(self.robot.lidar.scan_data[270:300])
-            print(a)
-            intersection = a > 1600
-        '''
-        time.sleep(3)
+            intersection = self.robot.lidar.intersect_flag
+            print(intersection)
+
         self.robot_guide_machine.send("intersection_detected")
 
     def on_intersection_detected(self):
