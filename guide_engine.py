@@ -49,7 +49,7 @@ class RobotGuide:
 
     def on_human_detected(self):
         print("speaking...")
-        self.tts.speak("text", None, False)
+        self.tts.speak("hello, how can I help you", None, False)
         self.robot_guide_machine.send("greeting_finished")
 
     def on_greeting_finished(self):
