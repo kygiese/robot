@@ -85,9 +85,9 @@
 
         <div class="guide-on">
                 <label class="switch-label">
-                    <span id="omodeLabel">Guide</span>
+                    <span id="guideLabel">Guide</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="guideToggle" onchange="toggle()">
+                        <input type="checkbox" id="guideToggle" onchange="toggleGuide()">
                         <span class="toggle-slider"></span>
                     </label>
                 </label>
@@ -192,6 +192,7 @@
         let activeMode = false;  // Control mode: false=standard, true=active response
         let followMode = false;
         let followOn = false;
+        let guideOn = false
         // ============== Debug Logging ==============
         function log(message, type = 'info') {
             const panel = document.getElementById('debugPanel');
@@ -377,31 +378,34 @@
         // ================ Guide =================
         function toggleGuide() {
             activeMode = document.getElementById('guideToggle').checked;
-            const modeLabel = document.getElementById('omodeLabel');
+            const modeLabel = document.getElementById('guideLabel');
 
             if (activeMode) {
                 modeLabel.textContent = 'Guide On';
                 guideOn = true
-                apiPost('/api/guide', { })
-                .then(result => {
-                    if (result.status === 'ok') {
-                        log('guide Mode: wall following on', 'success');
-                    }
-                })
-                .catch(() => {});
+                apiPost('/api/guide', {})
+                    .then(result => {
+                        if (result.status === 'ok') {
+                            log('guide Mode: wall following on', 'success');
+                        }
+                    })
+                    .catch(() => {
+                    });
 
             } else {
                 modeLabel.textContent = 'Guide Off';
                 followOn = false
-                 apiPost('/api/guide', { })
-                .then(result => {
-                    if (result.status === 'ok') {
-                          log('guide Mode: wall following off', 'success');
-                    }
-                })
-                .catch(() => {});
+                apiPost('/api/guide', {})
+                    .then(result => {
+                        if (result.status === 'ok') {
+                            log('guide Mode: wall following off', 'success');
+                        }
+                    })
+                    .catch(() => {
+                    });
 
             }
+        }
         // ============== Head Control ==============
         function updatePan(value) {
             document.getElementById('panValue').textContent = value;
@@ -636,6 +640,7 @@
                 .then(() => log('Connected to robot server', 'success'))
                 .catch(() => log('Failed to connect to robot server', 'error'));
         };
+
     </script>
 </body>
 </html>
