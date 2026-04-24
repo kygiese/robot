@@ -21,6 +21,8 @@ import threading
 import time
 import atexit
 import lidarV2 as lidar
+#from guide_engine import RobotGuide, RobotGuideMachine
+
 #import lidarV3 as lidar
 # Safe limits for servo positions (quarter-microseconds)
 # Standard servo range is 3000-9000, center at 6000
@@ -304,6 +306,8 @@ class RobotControl:
         
         return {"status": "ok", "message": "Robot stopped"}
 
+
+
     def wallFollow(self):
         """
         STOP - Set all motors to neutral/stopped state.
@@ -337,9 +341,13 @@ class RobotControl:
             self.FollowMode = follow_mode
         return {"status": "ok", "message": ""}
 
+    '''
+    def guide(self):
+        guide_engine = RobotGuide(self)
+        guide_engine.guide()
+    '''
 
 
-    
     def drive(self, left_speed, right_speed):
         """
         Control wheel speeds for driving.
@@ -549,6 +557,9 @@ class RobotControl:
             elif hasattr(component, 'motor') and hasattr(component.motor, 'close'):
                 component.motor.close()
 
+    @property
+    def lidar(self):
+        return self._lidar
 
 
 # Singleton instance for easy access
