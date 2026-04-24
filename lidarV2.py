@@ -96,7 +96,7 @@ class Lidar:
         count = 0
         try:
             for count, scan in enumerate(scan_generator()):
-                scan_data[min([359, floor(scan.angle)])] = scan.distance
+                self.scan_data[min([359, floor(scan.angle)])] = scan.distance
 
             #-------------------------------------------------------------
                 if 260 < scan.angle < 280:
@@ -119,8 +119,8 @@ class Lidar:
 
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
-
-                    left_speed, right_speed = wall_follow.find_speeds(scan_data, -50, self.robot.FollowMode)
+                    self.robot.FollowMode = True
+                    left_speed, right_speed = wall_follow.find_speeds(self.scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
 
 
