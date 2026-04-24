@@ -3,11 +3,16 @@ import numpy as np
 
 w = 394
 
-def find_speeds(scan_data, default_speed):
+def find_speeds(scan_data, default_speed, wall_side):
 
     points = []
 
-    for i in range(120, 240):
+    if wall_side:
+        arc = list(range(300,360)) + list(range(0,60))
+    else:
+        arc = list(range(120,240))
+
+    for i in arc:
         if scan_data[i] > 0:
             x = scan_data[i] * math.cos(math.radians(i))
             y = scan_data[i] * math.sin(math.radians(i))
@@ -23,13 +28,18 @@ def find_speeds(scan_data, default_speed):
     m,b = np.polyfit(x_arr, y_arr, 1)
 
 #----------------- distance calc -------
-    distance = 500 # the wanted distance
+    distance = 300 # the wanted distance
     mesuredDistance = abs(b)/(m**2 +1)
     distanceTarget = mesuredDistance - distance
 #--------------  ------------ - -- -
 
     target_x = 700
-    target_y = (m * target_x + b) - distanceTarget
+    target_y = (m * target_x + b)
+
+    if wall_side:
+        target_y += (distanceTarget*2)
+    else:
+         target_y -= (distanceTarget*2)
 
     ld = math.sqrt(target_x**2 + target_y**2)
 
