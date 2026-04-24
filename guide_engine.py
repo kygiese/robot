@@ -33,10 +33,7 @@ def listen():
     return "bathroom"
 
 
-def valid(response):
-    if response == "bathroom" or response == "lab":
-        return True
-    return False
+
 
 
 class RobotGuide:
@@ -44,6 +41,11 @@ class RobotGuide:
         self.robot_guide_machine = RobotGuideMachine(self)
         self.robot = robot
         self.tts = TextToSpeech()
+
+    def valid(self, response):
+        if response == "bathroom" or response == "lab":
+            return True
+        return False
 
     def on_human_detected(self):
         #self.tts.speak("text", None, False)
