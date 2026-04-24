@@ -2,8 +2,7 @@
 import time
 
 from statemachine import StateChart, State, StateMachine
-
-from robot_control import RobotControl
+import robot_control
 from services.text_to_speech import TextToSpeech
 
 
@@ -41,7 +40,7 @@ def valid(response):
 
 
 class RobotGuide:
-    def __init__(self, robot : RobotControl):
+    def __init__(self, robot : robot_control.RobotControl):
         self.robot_guide_machine = RobotGuideMachine(self)
         self.robot = robot
         self.tts = TextToSpeech()
