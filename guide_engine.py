@@ -65,7 +65,7 @@ class RobotGuide:
 
     def on_turning_around_complete(self):
         print("finding wall...")
-        self.robot_guide_machine.send("aligning_to_hallway")
+        self.robot_guide_machine.send("aligning_complete")
 
     def on_aligning_complete(self):
         print("driving...")
