@@ -7,10 +7,10 @@ def find_speeds(scan_data, default_speed, wall_side):
 
     points = []
 
-    if wall_side:
+    if wall_side: # left wall
         arc = list(range(120, 240))
     else:
-        arc = list(range(300, 360)) + list(range(0, 40))
+        arc = list(range(300, 360)) + list(range(0, 60))
 
 
     for i in arc:
@@ -34,13 +34,15 @@ def find_speeds(scan_data, default_speed, wall_side):
     distanceTarget = mesuredDistance - distance
 #--------------  ------------ - -- -
 
-    target_x = 200
+
+
+    target_x = 700
     target_y = (m * target_x + b)
 
-    if wall_side:
-        target_y -= (distanceTarget)
+    if wall_side:  # left wall
+        target_y -= (distanceTarget * 2)
     else:
-        target_y += (distanceTarget)
+        target_y += (distanceTarget * 2)
 
 
     ld = math.sqrt(target_x**2 + target_y**2)
@@ -56,6 +58,10 @@ def find_speeds(scan_data, default_speed, wall_side):
 
     right_speed = default_speed + (vel*w/2)
     left_speed = default_speed - (vel*w/2)
+
+    print(mesuredDistance)
+    print(target_x, target_y)
+
     return left_speed, -right_speed
 
 
