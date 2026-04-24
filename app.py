@@ -246,6 +246,15 @@ def api_wallFollowMode():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route("/api/guide", methods=["POST"])
+def api_guide():
+
+    try:
+        result = get_robot().guide()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route("/api/heartbeat", methods=["POST"])
 def api_heartbeat():
     """
