@@ -116,17 +116,16 @@ class Lidar:
                     else:
                         self.checkB = False
             # -------------------------------------------------------------
-                if scan.angle == 300:
-                    print(scan.distance)
-                    if scan.distance > 1200:
-                        self.intersect_flag = True
-                        print(self.intersect_flag)
+
+
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
                     self.robot.FollowMode = True
                     left_speed, right_speed = wall_follow.find_speeds(self.scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
 
+                    if (right_speed-left_speed) > 10:
+                        self.intersect_flag = True
 
                     '''
                     #if self.follow == "right":
