@@ -48,18 +48,18 @@ class RobotGuide:
         return False
 
     def on_human_detected(self):
-        #self.tts.speak("text", None, False)
         print("speaking...")
+        self.tts.speak("text", None, False)
         self.robot_guide_machine.send("greeting_finished")
 
     def on_greeting_finished(self):
         print("listening...")
-        self.robot_guide_machine.send("response_detected", "bathroom")
+        self.robot_guide_machine.send("response_detected", listen())
 
     def on_response_detected(self):
-        #self.robot.drive_joystick(25, 0)
-        #time.sleep(1)
-        #self.robot.drive_joystick(0, 0)
+        self.robot.drive_joystick(25, 0)
+        time.sleep(1)
+        self.robot.drive_joystick(0, 0)
         print("turning...")
         self.robot_guide_machine.send("turning_around_complete")
 
