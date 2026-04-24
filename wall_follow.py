@@ -35,9 +35,10 @@ def find_speeds(scan_data, default_speed):
 
     alpha = math.atan2(target_y, target_x)
 
+
     r = ld/(2*math.sin(alpha))
 
-    print(r)
+    #print(r)
 
     vel = (2 * math.sin(alpha) /ld) * default_speed
 
