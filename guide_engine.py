@@ -1,5 +1,5 @@
 #states: waiting, greeting, listening, turning, following, turning, following, finished
-'''import time
+import time
 
 from statemachine import StateChart, State, StateMachine
 
@@ -92,7 +92,7 @@ class RobotGuide:
                 human_detected = True
         self.robot_guide_machine.send("human_detected")
 
-
+        '''
         # state 1 listening
         response_detected = False
         while not response_detected:
@@ -123,6 +123,5 @@ class RobotGuide:
             if self.robot_guide_machine.final_navigation.is_active:
                 self.robot_guide_machine.send("destination_reached")
                 final_drive = False
+        '''
 
-
-'''

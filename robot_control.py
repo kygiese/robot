@@ -21,7 +21,7 @@ import threading
 import time
 import atexit
 import lidarV2 as lidar
-#from guide_engine import RobotGuide, RobotGuideMachine
+from guide_engine import RobotGuide, RobotGuideMachine
 
 #import lidarV3 as lidar
 # Safe limits for servo positions (quarter-microseconds)
@@ -341,11 +341,11 @@ class RobotControl:
             self.FollowMode = follow_mode
         return {"status": "ok", "message": ""}
 
-    '''
+
     def guide(self):
         guide_engine = RobotGuide(self)
         guide_engine.guide()
-    '''
+
 
 
     def drive(self, left_speed, right_speed):
