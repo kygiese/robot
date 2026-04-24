@@ -245,7 +245,7 @@ def api_wallFollowMode():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
+'''
 @app.route("/api/guide", methods=["POST"])
 def api_guide():
 
@@ -254,6 +254,7 @@ def api_guide():
         return jsonify(result)
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+'''
 
 @app.route("/api/heartbeat", methods=["POST"])
 def api_heartbeat():
