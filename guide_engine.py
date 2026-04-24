@@ -57,7 +57,7 @@ class RobotGuide:
         self.robot_guide_machine.send("response_detected", listen())
 
     def on_response_detected(self):
-        self.robot.drive_joystick(25, 0)
+        self.robot.drive_joystick(25, 25)
         time.sleep(1)
         self.robot.drive_joystick(0, 0)
         print("turning...")
