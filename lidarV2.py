@@ -5,6 +5,9 @@ import time
 import atexit
 import wall_follow
 import math
+
+from app import robot
+
 forward_left = -1
 forward_right = 1
 
@@ -118,7 +121,7 @@ class Lidar:
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
 
                     left_speed, right_speed = wall_follow.find_speeds(scan_data, -50)
-                    self.robot.drive(left_speed, right_speed)
+                    self.robot.drive(left_speed, right_speed, self.robot.FollowMode)
 
 
                     '''
