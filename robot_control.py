@@ -185,9 +185,9 @@ class RobotControl:
                 print(self._lidar.checkB)
                 print(self._lidar.checkF)
 
-              #  time.sleep(6)
-              #  guide_engine = RobotGuide(self)
-              #  guide_engine.guide()
+                time.sleep(6)
+                guide_engine = RobotGuide(self)
+                guide_engine.guide()
 
                 self.currentSpeedR = 0
                 self.currentSpeedL = 0
