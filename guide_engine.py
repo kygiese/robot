@@ -33,7 +33,6 @@ def listen():
     return "bathroom"
 
 
-
 def average(scan_data):
     s = 0
     i = 1
@@ -49,7 +48,6 @@ class RobotGuide:
         self.robot_guide_machine = RobotGuideMachine(self)
         self.robot = robot
         self.tts = TextToSpeech()
-        self.destination = ""
 
     def valid(self, response):
         if response == "bathroom" or response == "lab":
@@ -63,8 +61,7 @@ class RobotGuide:
 
     def on_greeting_finished(self):
         print("listening...")
-        self.destination = listen()
-        self.robot_guide_machine.send("response_detected", self.destination)
+        self.robot_guide_machine.send("response_detected", listen())
 
     def on_response_detected(self):
         self.robot.drive_joystick(50, 50)
@@ -79,38 +76,32 @@ class RobotGuide:
 
     def on_aligning_complete(self):
         print("driving...")
+
         self.robot.FollowOn = True
-        #intersection = False
-        time.sleep(6)
-      #  while not intersection:
-       #     intersection = True
-        #time.sleep(0.5)
-        self.robot.FollowOn = False
-        self.robot.stop()
-        #self.robot_guide_machine.send("intersection_detected")
+        intersection = False
+        time.sleep(2)
+        while not intersection:
+            intersection = self.robot.lidar.intersect_flag
+        time.sleep(0.5)
+        self.robot_guide_machine.send("intersection_detected")
 
     def on_intersection_detected(self):
         self.robot.FollowOn = False
         self.robot.stop()
         print("turning...")
-        if self.destination == "bathroom":
-            self.robot.drive_joystick(-50, 50)
-        else:
-            self.robot.drive_joystick(50, 50)
+        self.robot.drive_joystick(50, 50)
         time.sleep(0.4)
-        self.robot.drive_joystick(0,0)
         self.robot_guide_machine.send("turning_complete")
 
     def on_turning_complete(self):
         print("driving...")
         self.robot.drive_joystick(0, 50)
         time.sleep(2)
-        self.robot.drive_joystick(0,0)
+        self.robot.drive_joystick(0, 0)
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
-        sentence = "we have arrived " + self.destination
-        self.tts.speak(sentence, None, False)
+        self.tts.speak("We have arrived", None, False)
         print("speaking...")
 
     def guide(self):
@@ -118,7 +109,8 @@ class RobotGuide:
         print("starting..........")
         human_detected = False
         while not human_detected:
-            human_detected = self.robot.lidar.checkF
+            if self.robot.lidar.checkF:
+                human_detected = True
         self.robot_guide_machine.send("human_detected")
 
         '''
@@ -153,4 +145,3 @@ class RobotGuide:
                 self.robot_guide_machine.send("destination_reached")
                 final_drive = False
         '''
-

@@ -6,7 +6,6 @@ import atexit
 import wall_follow
 import math
 
-
 forward_left = -1
 forward_right = 1
 
@@ -36,7 +35,6 @@ class Lidar:
         self.left_front = 0
         self.scan_data = [0] * 360
         self.intersect_flag = False
-
 
     def get_info(self):
         lidar = PyRPlidar()
@@ -98,7 +96,7 @@ class Lidar:
             for count, scan in enumerate(scan_generator()):
                 self.scan_data[min([359, floor(scan.angle)])] = scan.distance
 
-            #-------------------------------------------------------------
+                # -------------------------------------------------------------
                 if 260 < scan.angle < 280:
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
@@ -115,19 +113,15 @@ class Lidar:
 
                     else:
                         self.checkB = False
-            # -------------------------------------------------------------
-
-
+                # -------------------------------------------------------------
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
                     self.robot.FollowMode = True
                     left_speed, right_speed = wall_follow.find_speeds(self.scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
                     print(left_speed, right_speed)
-                    if (right_speed+left_speed) > 30:
+                    if (right_speed + left_speed) > 20:
                         self.intersect_flag = True
-                    else:
-                        self.intersect_flag = False
 
                     '''
                     #if self.follow == "right":
@@ -159,7 +153,7 @@ class Lidar:
                     else:
                         print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
-            
+
                     if self.follow == "left":
                         self.left = average(scan_data[355:5])
                         self.left_back = average(scan_data[45:55])
@@ -180,7 +174,7 @@ class Lidar:
 
                     '''
 
-               # print(self.right)
+            # print(self.right)
 
 
         except KeyboardInterrupt:
