@@ -10,11 +10,11 @@ def find_speeds(scan_data, default_speed, wall_side):
     if wall_side: # left wall
         arc = list(range(120, 240))
     else:
-        arc = list(range(300, 360)) + list(range(0, 40))
+        arc = list(range(300, 360)) + list(range(0, 30))
 
 
     for i in arc:
-        if scan_data[i] > 0:
+        if scan_data[i] > 200:
             x = scan_data[i] * math.cos(math.radians(i))
             y = scan_data[i] * math.sin(math.radians(i))
             points.append((x, y))
