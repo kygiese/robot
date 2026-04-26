@@ -10,7 +10,7 @@ def find_speeds(scan_data, default_speed, wall_side):
     if wall_side: # left wall
         arc = list(range(120, 240))
     else:
-        arc = list(range(300, 360)) + list(range(0, 60))
+        arc = list(range(300, 360)) + list(range(0, 40))
 
 
     for i in arc:
