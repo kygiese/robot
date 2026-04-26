@@ -62,7 +62,7 @@ def find_speeds(scan_data, default_speed, wall_side):
     print(mesuredDistance)
     print(target_x, target_y)
 
-    return -left_speed, right_speed
+    return left_speed, -right_speed
 
 
 
