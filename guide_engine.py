@@ -81,7 +81,7 @@ class RobotGuide:
         print("driving...")
         self.robot.FollowOn = True
         #intersection = False
-        time.sleep(2)
+        time.sleep(6)
       #  while not intersection:
        #     intersection = True
         #time.sleep(0.5)
