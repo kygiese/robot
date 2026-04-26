@@ -3,7 +3,7 @@ import numpy as np
 
 #w = 394
 
-def find_speeds(scan_data, default_speed, wall_side, distance=300, target=700, w=394):
+def find_speeds(scan_data, default_speed, wall_side, distance, target, w):
 
     points = []
 
