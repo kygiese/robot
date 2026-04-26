@@ -96,19 +96,14 @@ class RobotGuide:
         else:
             self.robot.drive_joystick(50, 50)
         time.sleep(0.4)
+        self.robot.drive_joystick(0,0)
         self.robot_guide_machine.send("turning_complete")
 
     def on_turning_complete(self):
         print("driving...")
-        self.robot.FollowOn = True
-        if self.destination == "bathroom":
-            self.robot.FollowSide = True
-        #change for right side
-        else:
-            self.robot.FollowOn = True
-        time.sleep(3)
-        self.robot.FallowOn = False
-        self.robot.stop()
+        self.robot.drive_joystick(0, 50)
+        time.sleep(2)
+        self.robot.drive_joystick(0,0)
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
