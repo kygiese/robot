@@ -429,7 +429,7 @@ class RobotControl:
 
     def set_target(self, position):
 
-        self.lidar.target = position
+        self._lidar.target = position
         return {
             "status": "ok",
             "target": position
@@ -437,7 +437,7 @@ class RobotControl:
 
     def set_w(self, position):
 
-        self.lidar.w = position
+        self._lidar.w = position
         return {
             "status": "ok",
             "w": position
