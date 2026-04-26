@@ -155,7 +155,7 @@ def api_test_target():
     return jsonify(result)
 
 @app.route("/api/tests/w", methods=["POST"])
-def api_test_distance():
+def api_test_w():
     data = request.get_json()
     if not data or "position" not in data:
         return jsonify({"status": "error", "message": "Position required"}), 400
