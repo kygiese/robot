@@ -48,10 +48,13 @@ class RobotGuide:
         self.robot_guide_machine = RobotGuideMachine(self)
         self.robot = robot
         self.tts = TextToSpeech()
+        self.destination = ""
 
     def valid(self, response):
         if response == "bathroom" or response == "lab":
+            self.destination = "bathroom"
             return True
+
         return False
 
     def on_human_detected(self):
@@ -64,6 +67,7 @@ class RobotGuide:
         self.robot_guide_machine.send("response_detected", listen())
 
     def on_response_detected(self):
+        self.tts.speak("follow me")
         self.robot.drive_joystick(50, 50)
         time.sleep(1.1)
         self.robot.drive_joystick(0, 0)
@@ -82,7 +86,7 @@ class RobotGuide:
         time.sleep(2)
         while not intersection:
             intersection = self.robot.lidar.intersect_flag
-        time.sleep(0.5)
+        time.sleep(1)
         self.robot_guide_machine.send("intersection_detected")
 
     def on_intersection_detected(self):
@@ -101,7 +105,7 @@ class RobotGuide:
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
-        self.tts.speak("We have arrived", None, False)
+        self.tts.speak("We have arrived " + self.destination, None, False)
         print("speaking...")
 
     def guide(self):
