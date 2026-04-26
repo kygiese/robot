@@ -56,7 +56,7 @@ def find_speeds(scan_data, default_speed, wall_side):
 
     vel = (2 * math.sin(alpha) /ld) * default_speed
 
-    if wall_side:  # left wall
+    if wall_side:  # left wal
         right_speed = default_speed + (vel * w / 2)
         left_speed = default_speed - (vel * w / 2)
     else:
