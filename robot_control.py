@@ -421,7 +421,7 @@ class RobotControl:
 
     def set_distance(self, position):
 
-        self.lidar.distance = position
+        self._lidar.distance = position
         return {
             "status": "ok",
             "distance": position
