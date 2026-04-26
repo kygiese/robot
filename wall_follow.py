@@ -10,7 +10,7 @@ def find_speeds(scan_data, default_speed, wall_side):
     if wall_side: # left wall
         arc = list(range(120, 240))
     else:
-        arc = list(range(300, 360)) + list(range(0, 30))
+        arc = list(range(330, 360)) + list(range(0, 30))
 
 
     for i in arc:
@@ -29,7 +29,7 @@ def find_speeds(scan_data, default_speed, wall_side):
     m,b = np.polyfit(x_arr, y_arr, 1)
 
 #----------------- distance calc -------
-    distance = 300 # the wanted distance
+    distance = 800 # the wanted distance
     mesuredDistance = abs(b)/math.sqrt(m**2 +1)
     distanceTarget = mesuredDistance - distance
 #--------------  ------------ - -- -
