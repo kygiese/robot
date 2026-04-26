@@ -1,9 +1,9 @@
 import math
 import numpy as np
 
-w = 394
+#w = 394
 
-def find_speeds(scan_data, default_speed, wall_side):
+def find_speeds(scan_data, default_speed, wall_side, distance=300, target=700, w=394):
 
     points = []
 
@@ -29,14 +29,14 @@ def find_speeds(scan_data, default_speed, wall_side):
     m,b = np.polyfit(x_arr, y_arr, 1)
 
 #----------------- distance calc -------
-    distance = 300 # the wanted distance
+    distance = distance # the wanted distance
     mesuredDistance = abs(b)/math.sqrt(m**2 +1)
     distanceTarget = mesuredDistance - distance
 #--------------  ------------ - -- -
 
 
 
-    target_x = 700
+    target_x = target
     target_y = (m * target_x + b)
 
     if wall_side:  # left wall

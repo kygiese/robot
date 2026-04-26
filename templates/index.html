@@ -96,7 +96,34 @@
         <!-- Head Control Section -->
         <div class="section">
             <h2>Head Control</h2>
-            
+
+             <div class="slider-container">
+                <label>
+                    <span>distance</span>
+                    <span class="slider-value" id="distanceValue">0</span>
+                </label>
+                <input type="range" id="distanceSlider" min="0" max="3000" value="300"
+                       oninput="updatedistance(this.value)" onchange="senddistance(this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>
+                    <span>target</span>
+                    <span class="slider-value" id="targetValue">0</span>
+                </label>
+                <input type="range" id="targetSlider" min="0" max="3000" value="700"
+                       oninput="updatedistance(this.value)" onchange="senddistance(this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>
+                    <span>w</span>
+                    <span class="slider-value" id="wValue">0</span>
+                </label>
+                <input type="range" id="wSlider" min="0" max="3000" value="394"
+                       oninput="updatedistance(this.value)" onchange="senddistance(this.value)">
+            </div>
+
             <div class="slider-container">
                 <label>
                     <span>Pan (Left/Right)</span>
@@ -375,6 +402,66 @@
         }
 
         // ============== Head Control ==============
+         function updatedistance(value) {
+            document.getElementById('distanceValue').textContent = value;
+            // In active mode, send command immediately while moving (with throttling)
+            if (activeMode) {
+                senddistance(value);
+            }
+        }
+
+        function senddistance(value) {
+            apiPost('/api/tests/distance', { position: parseInt(value) })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        if (!activeMode) {
+                            log(`distance set to ${result.distance}`, 'success');
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+         function updatetarget(value) {
+            document.getElementById('targetValue').textContent = value;
+            // In active mode, send command immediately while moving (with throttling)
+            if (activeMode) {
+                sendtarget(value);
+            }
+        }
+
+        function sendtarget(value) {
+            apiPost('/api/tests/target', { position: parseInt(value) })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        if (!activeMode) {
+                            log(`distance set to ${result.target}`, 'success');
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+         function updatew(value) {
+            document.getElementById('wValue').textContent = value;
+            // In active mode, send command immediately while moving (with throttling)
+            if (activeMode) {
+                sendw(value);
+            }
+        }
+
+        function sendw(value) {
+            apiPost('/api/tests/w', { position: parseInt(value) })
+                .then(result => {
+                    if (result.status === 'ok') {
+                        if (!activeMode) {
+                            log(`distance set to ${result.w}`, 'success');
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
         function updatePan(value) {
             document.getElementById('panValue').textContent = value;
             // In active mode, send command immediately while moving (with throttling)

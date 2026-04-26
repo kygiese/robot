@@ -134,6 +134,36 @@ def api_drive():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route("/api/tests/distance", methods=["POST"])
+def api_test_distance():
+    data = request.get_json()
+    if not data or "position" not in data:
+        return jsonify({"status": "error", "message": "Position required"}), 400
+
+    position = data.get("position")
+    result = get_robot().set_distance(position)
+    return jsonify(result)
+
+@app.route("/api/tests/target", methods=["POST"])
+def api_test_target():
+    data = request.get_json()
+    if not data or "position" not in data:
+        return jsonify({"status": "error", "message": "Position required"}), 400
+
+    position = data.get("position")
+    result = get_robot().set_target(position)
+    return jsonify(result)
+
+@app.route("/api/tests/w", methods=["POST"])
+def api_test_distance():
+    data = request.get_json()
+    if not data or "position" not in data:
+        return jsonify({"status": "error", "message": "Position required"}), 400
+
+    position = data.get("position")
+    result = get_robot().set_w(position)
+    return jsonify(result)
+
 @app.route("/api/head/pan", methods=["POST"])
 def api_head_pan():
     """

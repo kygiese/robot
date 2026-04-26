@@ -419,6 +419,30 @@ class RobotControl:
             self._last_command_time = time.time()
             self._set_wheel_speeds_internal(left_speed, right_speed)
 
+    def set_distance(self, position):
+
+        self.lidar.distance = position
+        return {
+            "status": "ok",
+            "distance": position
+        }
+
+    def set_target(self, position):
+
+        self.lidar.target = position
+        return {
+            "status": "ok",
+            "target": position
+        }
+
+    def set_w(self, position):
+
+        self.lidar.w = position
+        return {
+            "status": "ok",
+            "w": position
+        }
+
     def head_pan(self, position):
         """
         Control head pan (left/right rotation).

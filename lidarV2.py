@@ -11,6 +11,7 @@ forward_left = -1
 forward_right = 1
 
 
+
 def average(scan_data):
     s = 0
     i = 1
@@ -34,6 +35,10 @@ class Lidar:
         self.left = 0
         self.left_back = 0
         self.left_front = 0
+
+        self.distance = 300
+        self.target = 700
+        self.w = 394
 
 
 
