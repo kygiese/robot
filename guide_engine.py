@@ -83,7 +83,7 @@ class RobotGuide:
         intersection = False
         time.sleep(2)
         while not intersection:
-            intersection = self.robot.lidar.intersect_flag
+            intersection = True
         time.sleep(0.5)
         self.robot.FollowOn = False
         self.robot.stop()
