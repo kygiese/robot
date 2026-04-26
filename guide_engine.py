@@ -122,8 +122,7 @@ class RobotGuide:
         print("starting..........")
         human_detected = False
         while not human_detected:
-            if self.robot.lidar.checkF:
-                human_detected = True
+            human_detected = self.robot.lidar.checkF
         self.robot_guide_machine.send("human_detected")
 
         '''
