@@ -19,7 +19,7 @@ class RobotGuideMachine(StateChart):
     stopped = State(final=True)
 
     human_detected = waiting.to(greeting)
-    greeting_finished = greeting.to(aligning_to_hallway)
+    greeting_finished = greeting.to(listening)
     response_detected = listening.to(turning_around, cond="valid") | listening.to(listening, unless="valid")
     turning_around_complete = turning_around.to(aligning_to_hallway)
     aligning_complete = aligning_to_hallway.to(moving_to_t)
