@@ -56,13 +56,18 @@ def find_speeds(scan_data, default_speed, wall_side):
 
     vel = (2 * math.sin(alpha) /ld) * default_speed
 
-    right_speed = default_speed + (vel*w/2)
-    left_speed = default_speed - (vel*w/2)
+    if wall_side:  # left wall
+        right_speed = default_speed + (vel * w / 2)
+        left_speed = default_speed - (vel * w / 2)
+    else:
+        right_speed = default_speed - (vel * w / 2)
+        left_speed = default_speed + (vel * w / 2)
+
 
     print(mesuredDistance)
     print(target_x, target_y)
 
-    return -left_speed, right_speed
+    return left_speed, -right_speed
 
 
 
