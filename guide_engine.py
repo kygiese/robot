@@ -33,6 +33,7 @@ def listen():
     return "bathroom"
 
 
+
 def average(scan_data):
     s = 0
     i = 1
@@ -48,6 +49,7 @@ class RobotGuide:
         self.robot_guide_machine = RobotGuideMachine(self)
         self.robot = robot
         self.tts = TextToSpeech()
+        self.destination = ""
 
     def valid(self, response):
         if response == "bathroom" or response == "lab":
@@ -61,7 +63,8 @@ class RobotGuide:
 
     def on_greeting_finished(self):
         print("listening...")
-        self.robot_guide_machine.send("response_detected", listen())
+        self.destination = listen()
+        self.robot_guide_machine.send("response_detected", self.destination)
 
     def on_response_detected(self):
         self.robot.drive_joystick(50, 50)
@@ -76,8 +79,8 @@ class RobotGuide:
 
     def on_aligning_complete(self):
         print("driving...")
-
         self.robot.FollowOn = True
+        self.robot.FollowSide = True
         intersection = False
         time.sleep(2)
         while not intersection:
@@ -89,25 +92,35 @@ class RobotGuide:
         self.robot.FollowOn = False
         self.robot.stop()
         print("turning...")
-        self.robot.drive_joystick(50, 50)
+        if self.destination == "bathroom":
+            self.robot.drive_joystick(-50, 50)
+        else:
+            self.robot.drive_joystick(50, 50)
         time.sleep(0.4)
         self.robot_guide_machine.send("turning_complete")
 
     def on_turning_complete(self):
         print("driving...")
-        self.robot.drive_joystick(0, 50)
-        time.sleep(2)
-        self.robot.drive_joystick(0, 0)
+        self.robot.FollowOn = True
+        if self.destination == "bathroom":
+            self.robot.FollowSide = True
+        #change for right side
+        else:
+            self.robot.FollowOn = True
+        time.sleep(3)
+        self.robot.FallowOn = False
+        self.robot.stop()
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
-        self.tts.speak("We have arrived", None, False)
+        sentence = "we have arrived " + self.destination
+        self.tts.speak(sentence, None, False)
         print("speaking...")
 
     def guide(self):
         # state 0 waiting for person
         print("starting..........")
-        human_detected = True
+        human_detected = False
         while not human_detected:
             if self.robot.lidar.checkF:
                 human_detected = True

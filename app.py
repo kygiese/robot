@@ -245,6 +245,7 @@ def api_wallFollowMode():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+#================ Guide ====================================
 
 @app.route("/api/guide", methods=["POST"])
 def api_guide():
@@ -428,7 +429,6 @@ def api_dialog_load():
         return jsonify({"status": "ok"})
     except Exception as exc:
         return jsonify({"status": "error", "message": str(exc)}), 500
-
 
 # ============== Error Handlers ==============
 
