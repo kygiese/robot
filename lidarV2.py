@@ -119,9 +119,12 @@ class Lidar:
                     self.robot.FollowMode = True
                     left_speed, right_speed = wall_follow.find_speeds(self.scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
-                    print(self.scan_data[240])
+                    if (right_speed + left_speed) > 20:
+                        self.intersect_flag = True
                     '''
-                    if self.scan_data[240] > 1800:
+                    print(self.scan_data[240])
+
+                    if self.scan_data[240] > 1600:
                         self.intersect_flag = True
                     else:
                         self.intersect_flag = False
