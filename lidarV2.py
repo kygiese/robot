@@ -92,8 +92,7 @@ class Lidar:
         scan_data = [0] * 360
         count = 0
         try:
-            self.robot.FollowOn = False
-            self.robot.FollowSide = False
+
             for count, scan in enumerate(scan_generator()):
                 scan_data[min([359, floor(scan.angle)])] = scan.distance
 

@@ -146,9 +146,11 @@ class RobotGuide:
     def valid(self, response):
         if response == "bathroom":
             self.destination = "bathroom"
+            self.robot.FollowSide = True
             return True
         if response == "robot lab":
             self.destination = "robot lab"
+            self.robot.FollowSide = False
             return True
         return False
 
