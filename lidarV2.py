@@ -22,6 +22,7 @@ def average(scan_data):
 
 class Lidar:
     def __init__(self, robot):
+        self.intersect_flag = None
         self.right_back = 0
         self.checkB = True
         self.checkF = True
@@ -118,7 +119,9 @@ class Lidar:
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
                     left_speed, right_speed = wall_follow.find_speeds(scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
-
+                    print(left_speed, right_speed)
+                    if (right_speed + left_speed) > 20:
+                        self.intersect_flag = True
                     '''
                     #if self.follow == "right":
                     self.left = average(scan_data[175:185])

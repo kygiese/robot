@@ -174,29 +174,25 @@ class RobotGuide:
     def on_turning_around_complete(self):
         print("finding wall...")
         time.sleep(2)
-        #self.robot_guide_machine.send("aligning_complete")
+        self.robot_guide_machine.send("aligning_complete")
 
     def on_aligning_complete(self):
         print("driving...")
+
         self.robot.FollowOn = True
         intersection = False
-        #time.sleep(8)
-        #self.robot.FollowOn = False
-        #self.robot.stop()
+        time.sleep(2)
         while not intersection:
             intersection = self.robot.lidar.intersect_flag
-        #self.robot_guide_machine.send("intersection_detected")
+        time.sleep(0.5)
+        self.robot_guide_machine.send("intersection_detected")
 
     def on_intersection_detected(self):
         self.robot.FollowOn = False
         self.robot.stop()
         print("turning...")
-        if self.destination == "robot lab":
-            self.robot.drive_joystick(50, 50)
-        else:
-            self.robot.drive_joystick(-50, 50)
+        self.robot.drive_joystick(50, 50)
         time.sleep(0.4)
-        self.robot.drive_joystick(0, 0)
         self.robot_guide_machine.send("turning_complete")
 
     def on_turning_complete(self):
