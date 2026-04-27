@@ -161,7 +161,7 @@ class RobotGuide:
 
     def on_greeting_finished(self):
         print("listening...")
-        self.robot_guide_machine.send("response_detected", listen())
+        self.robot_guide_machine.send("response_detected", "bathroom")
 
     def on_response_detected(self):
         self.robot.drive(25, 25)
