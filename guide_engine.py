@@ -164,7 +164,7 @@ class RobotGuide:
     def on_greeting_finished(self):
         print("listening...")
         self.robot.FollowSide = True
-        self.robot_guide_machine.send("response_detected", listen())
+        self.robot_guide_machine.send("response_detected", self.listen_fake())
 
     def on_response_detected(self):
         self.robot.drive_joystick(50, 50)
@@ -180,6 +180,7 @@ class RobotGuide:
     def on_aligning_complete(self):
         print("driving...")
         self.robot.FollowOn = True
+        print(self.robot.FollowMode)
         time.sleep(2)
         stop_event = threading.Event()
         thread = threading.Thread(target=self.worker, args=(stop_event,))
@@ -194,7 +195,7 @@ class RobotGuide:
         self.robot.FollowOn = False
         self.robot.stop()
         print("turning...")
-        self.robot.drive_joystick(50, 50)
+        #self.robot.drive_joystick(50, 50)
         time.sleep(0.4)
         self.robot_guide_machine.send("turning_complete")
 
