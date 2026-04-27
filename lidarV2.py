@@ -118,17 +118,15 @@ class Lidar:
                 # -------------------------------------------------------------
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
-                    self.robot.FollowMode = True
                     left_speed, right_speed = wall_follow_new.find_speeds(scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
-                    print(self.checkF, self.checkB)
-                    print(self.robot.FollowOn, self.robot.FollowMode)
+
                     #print(left_speed, right_speed)
                     if  scan_data[200] > 1600:
                         self.intersect_flag = True
                     else:
                         self.intersect_flag = False
-                    #print(self.intersect_flag)
+                    print(self.intersect_flag)
                     '''
                     #if self.follow == "right":
                     self.left = average(scan_data[175:185])

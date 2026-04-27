@@ -147,11 +147,11 @@ class RobotGuide:
         if response == "bathroom":
             print("bathroom")
             self.destination = "bathroom"
-            self.robot.FollowSide = True
+            self.robot.FollowMode = True
             return True
         if response == "robot lab":
             self.destination = "robot lab"
-            self.robot.FollowSide = False
+            self.robot.FollowMode = False
             return True
         return False
 
@@ -181,8 +181,8 @@ class RobotGuide:
         self.robot.FollowOn = True
         intersection = False
         time.sleep(2)
-        #while not intersection:
-        #    intersection = self.robot.lidar.intersect_flag
+        while not intersection:
+            intersection = self.robot.lidar.intersect_flag
         time.sleep(0.5)
         self.robot_guide_machine.send("intersection_detected")
 
