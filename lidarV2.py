@@ -37,6 +37,7 @@ class Lidar:
         self.intersect_flag = False
         self.robot.FollowMode = True
 
+
     def get_info(self):
         lidar = PyRPlidar()
         lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)

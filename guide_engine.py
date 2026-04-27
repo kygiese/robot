@@ -169,7 +169,7 @@ class RobotGuide:
         time.sleep(1.1)
         self.robot.drive_joystick(0, 0)
         print("turning...")
-        self.robot_guide_machine.send("turning_around_complete")
+        #self.robot_guide_machine.send("turning_around_complete")
 
     def on_turning_around_complete(self):
         print("finding wall...")
