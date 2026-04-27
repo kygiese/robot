@@ -136,6 +136,7 @@ def listen():
     return "bathroom"
 
 
+
 class RobotGuide:
     def __init__(self, robot):
         self.robot_guide_machine = RobotGuideMachine(self)
@@ -179,20 +180,11 @@ class RobotGuide:
     def on_aligning_complete(self):
         print("driving...")
         self.robot.FollowOn = True
-        intersection = False
         time.sleep(2)
-        if not intersection:
-            time.sleep(1)
-            intersection = self.robot.lidar.intersect_flag
-        if not intersection:
-            time.sleep(1)
-            intersection = self.robot.lidar.intersect_flag
-        if not intersection:
-            time.sleep(1)
-            intersection = self.robot.lidar.intersect_flag
-        if not intersection:
-            time.sleep(1)
-            intersection = self.robot.lidar.intersect_flag
+        stop_event = threading.Event()
+        thread = threading.Thread(target=self.worker, args=(stop_event,))
+        thread.start()
+        thread.join()
         #while not intersection:
         #    intersection = self.robot.lidar.intersect_flag
         time.sleep(0.5)
@@ -237,7 +229,18 @@ class RobotGuide:
     def listen_fake(self):
         listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom})
 
+    def worker(self, stop_event: threading.Event):
+        """
+        Runs in a background thread until stop_event is set.
+        Accumulates results, then returns when the condition is met.
+        """
+        while not stop_event.is_set():
+            intersect = self.robot.lidar.intersect_flag
+            time.sleep(0.5)
+            if intersect:
+                stop_event.set()
 
+        print(f"Worker done")
 
 
 
