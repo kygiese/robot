@@ -145,6 +145,7 @@ class RobotGuide:
 
     def valid(self, response):
         if response == "bathroom":
+            print("bathroom")
             self.destination = "bathroom"
             self.robot.FollowSide = True
             return True
@@ -161,11 +162,11 @@ class RobotGuide:
 
     def on_greeting_finished(self):
         print("listening...")
-        self.robot_guide_machine.send("response_detected", "bathroom")
+        self.robot_guide_machine.send("response_detected", listen())
 
     def on_response_detected(self):
-        self.robot.drive(25, 25)
-        time.sleep(1.5)
+        self.robot.drive_joystick(25, 25)
+        time.sleep(1.1)
         self.robot.drive_joystick(0, 0)
         print("turning...")
         self.robot_guide_machine.send("turning_around_complete")
