@@ -126,6 +126,8 @@ class Lidar:
                         self.intersect_flag = True
                     else:
                         self.intersect_flag = False
+
+                    print(self.intersect_flag)
                     '''                   
                      if self.scan_data[240] > 1600:
                         self.intersect_flag = True

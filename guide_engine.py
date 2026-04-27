@@ -183,7 +183,7 @@ class RobotGuide:
         #time.sleep(2)
         while not intersection:
             intersection = self.robot.lidar.intersect_flag
-        self.robot_guide_machine.send("intersection_detected")
+        #self.robot_guide_machine.send("intersection_detected")
 
     def on_intersection_detected(self):
         self.robot.FollowOn = False
