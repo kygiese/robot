@@ -376,27 +376,36 @@
         }
 
         // ================ Guide =================
-
         function toggleGuide() {
-         guideOn = document.getElementById('guideToggle').checked;
-         const modeLabel = document.getElementById('guideLabel');
+            activeMode = document.getElementById('guideToggle').checked;
+            const modeLabel = document.getElementById('guideLabel');
 
-          if (guideOn) {
-              modeLabel.textContent = 'Guide On';
-          } else {
-             modeLabel.textContent = 'Guide Off';
-          }
+            if (activeMode) {
+                modeLabel.textContent = 'Guide On';
+                guideOn = true
+                apiPost('/api/guide', { })
+                    .then(result => {
+                        if (result.status === 'ok') {
+                            log('guide Mode: wall following on', 'success');
+                        }
+                    })
+                    .catch(() => {
+                    });
 
-    apiPost('/api/guide', { on: guideOn })
-        .then(result => {
-            if (result.status === 'ok') {
-                log(`Guide Mode: ${guideOn ? 'on' : 'off'}`, 'success');
+            } else {
+                modeLabel.textContent = 'Guide Off';
+                followOn = false
+                apiPost('/api/guide', {})
+                    .then(result => {
+                        if (result.status === 'ok') {
+                            log('guide Mode: wall following off', 'success');
+                        }
+                    })
+                    .catch(() => {
+                    });
+
             }
-        })
-        .catch(() => {
-            log('Guide API call failed', 'error');
-        });
-}
+        }
         // ============== Head Control ==============
         function updatePan(value) {
             document.getElementById('panValue').textContent = value;
