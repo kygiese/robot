@@ -3,7 +3,7 @@ import robot_control
 from math import floor
 import time
 import atexit
-import wall_follow_new
+import wall_follow
 import math
 
 forward_left = -1
@@ -117,14 +117,21 @@ class Lidar:
                 # -------------------------------------------------------------
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
-                    left_speed, right_speed = wall_follow_new.find_speeds(self.scan_data, -50, self.robot.FollowMode)
+                    left_speed, right_speed = wall_follow.find_speeds(self.scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
+
                     print(self.scan_data[240])
-                    if self.scan_data[240] > 1600:
+                    print(left_speed, right_speed)
+                    if (right_speed + left_speed) > 20:
+                        self.intersect_flag = True
+                    #else:
+                    #    self.intersect_flag = False
+                    '''                   
+                     if self.scan_data[240] > 1600:
                         self.intersect_flag = True
                     else:
                         self.intersect_flag = False
-
+                    '''
                     '''
                     #if self.follow == "right":
                     self.left = average(scan_data[175:185])
