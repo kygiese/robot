@@ -159,13 +159,10 @@ class RobotGuide:
 
     def on_greeting_finished(self):
         print("listening...")
-        #listen_fake()
-        #then remove valid check
         self.robot_guide_machine.send("response_detected", listen())
 
     def on_response_detected(self):
-        self.tts.speak("follow me")
-        self.robot.drive_joystick(0, 50)
+        self.robot.drive_joystick(50, 50)
         time.sleep(1.1)
         self.robot.drive_joystick(0, 0)
         print("turning...")
@@ -173,10 +170,7 @@ class RobotGuide:
 
     def on_turning_around_complete(self):
         print("finding wall...")
-        self.robot.drive_joystick(0,50)
-        time.sleep(1)
-        self.robot.drive_joystick(0,0)
-        #self.robot_guide_machine.send("aligning_complete")
+        self.robot_guide_machine.send("aligning_complete")
 
     def on_aligning_complete(self):
         print("driving...")
@@ -205,7 +199,7 @@ class RobotGuide:
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
-        self.tts.speak("We have arrived at the " + self.destination, None, False)
+        self.tts.speak("We have arrived", None, False)
         print("speaking...")
 
     def guide(self):
