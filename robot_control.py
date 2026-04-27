@@ -366,7 +366,15 @@ class RobotControl:
 
         self.currentSpeedR = right_speed
         self.currentSpeedL = left_speed
-        
+
+        if left_speed < 0 < right_speed and self._lidar.checkF:
+            left_speed = 0
+            right_speed = 0
+
+        if left_speed > 0 < right_speed and self._lidar.checkB:
+            left_speed = 0
+            right_speed = 0
+
         with self._lock:
             self._last_command_time = time.time()
             self._set_wheel_speeds_internal(left_speed, right_speed)
