@@ -191,11 +191,11 @@ class RobotControl:
                 print(self._lidar.checkF)
 
                 time.sleep(6)
-                #guide_engine = RobotGuide(self)
-                #guide_engine.guide()
-                self.drive_joystick(0, 50)
-                time.sleep(2)
-                self.drive_joystick(0,0)
+                guide_engine = RobotGuide(self)
+                guide_engine.guide()
+                #self.drive_joystick(0, 50)
+                #time.sleep(2)
+                #self.drive_joystick(0,0)
                 self.currentSpeedR = 0
                 self.currentSpeedL = 0
 
