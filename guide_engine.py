@@ -14,7 +14,7 @@ from statemachine import StateChart, State, StateMachine
 from services.text_to_speech import TextToSpeech
 from vosk import Model, KaldiRecognizer
 
-MODEL_PATH = "static\\vosk-model-small-en-us-0.15"
+MODEL_PATH = "static/vosk-model-small-en-us-0.15"
 
 class RobotGuideMachine(StateChart):
     allow_event_without_transition = False
