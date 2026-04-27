@@ -10,7 +10,7 @@
 <body>
     <div class="container">
         <h1>Robot Control</h1>
-        
+
         <!-- Status Bar -->
         <div class="status-bar">
             <div class="status-indicator">
@@ -53,7 +53,7 @@
             <button class="stop-btn" id="stopBtn" onclick="emergencyStop()">STOP</button>
             <button class="stop-btn" id="stopBtn" onclick="wallFollow()">Wall Follow</button>
         </div>
-        
+
         <!-- Drive Control Section -->
         <div class="section">
             <h2>Drive Control</h2>
@@ -96,17 +96,17 @@
         <!-- Head Control Section -->
         <div class="section">
             <h2>Head Control</h2>
-            
+
             <div class="slider-container">
                 <label>
                     <span>Pan (Left/Right)</span>
                     <span class="slider-value" id="panValue">0</span>
                     <button class="center-btn" onclick="centerPan()">Center</button>
                 </label>
-                <input type="range" id="panSlider" min="-100" max="100" value="0" 
+                <input type="range" id="panSlider" min="-100" max="100" value="0"
                        oninput="updatePan(this.value)" onchange="sendPan(this.value)">
             </div>
-            
+
             <div class="slider-container">
                 <label>
                     <span>Tilt (Up/Down)</span>
@@ -116,16 +116,16 @@
                 <input type="range" id="tiltSlider" min="-100" max="100" value="0"
                        oninput="updateTilt(this.value)" onchange="sendTilt(this.value)">
             </div>
-            
+
             <div class="data-flow">
                 Data Flow: Slider value → Server validates (-100 to 100) → Servo position (4000-8000) → Head movement
             </div>
         </div>
-        
+
         <!-- Waist Control Section -->
         <div class="section">
             <h2>Waist Control</h2>
-            
+
             <div class="slider-container">
                 <label>
                     <span>Rotation</span>
@@ -135,12 +135,12 @@
                 <input type="range" id="waistSlider" min="-100" max="100" value="0"
                        oninput="updateWaist(this.value)" onchange="sendWaist(this.value)">
             </div>
-            
+
             <div class="data-flow">
                 Data Flow: Slider value → Server validates (-100 to 100) → Servo position → Waist rotation
             </div>
         </div>
-        
+
         <!-- Voice Output Section -->
         <div class="section">
             <h2>Voice Output</h2>
@@ -151,7 +151,7 @@
                 <button class="voice-btn" onclick="speak(3)">"Bread before toasters."</button>
             </div>
         </div>
-        
+
         <!-- Dialog Engine Section -->
         <div class="section">
             <h2>Dialog</h2>
@@ -164,7 +164,7 @@
                 <button class="center-btn" onclick="resetDialog()" title="Reset conversation">Reset</button>
             </div>
         </div>
-        
+
         <!-- Debug Panel -->
         <div class="section">
             <h2>Debug Log</h2>
@@ -178,7 +178,7 @@
         const HEARTBEAT_INTERVAL = 1000;  // 1 second
         const DRIVE_SEND_INTERVAL = 100;  // 100ms between drive commands
         const SLIDER_THROTTLE_INTERVAL = 50;  // 50ms throttle for active mode sliders
-        
+
         // ============== State Variables ==============
         let isConnected = false;
         let lastDriveSent = 0;
@@ -201,13 +201,13 @@
             const time = new Date().toLocaleTimeString();
             entry.textContent = `[${time}] ${message}`;
             panel.insertBefore(entry, panel.firstChild);
-            
+
             // Keep only last 20 entries
             while (panel.children.length > 20) {
                 panel.removeChild(panel.lastChild);
             }
         }
-        
+
         // ============== API Functions ==============
         async function apiPost(endpoint, data) {
             try {
@@ -216,12 +216,12 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                
+
                 if (response.status === 429) {
                     // Rate limited, ignore silently
                     return { status: 'rate_limited' };
                 }
-                
+
                 const result = await response.json();
                 updateConnectionStatus(true);
                 return result;
@@ -231,13 +231,13 @@
                 throw error;
             }
         }
-        
+
         // ============== Connection Status ==============
         function updateConnectionStatus(connected) {
             isConnected = connected;
             const dot = document.getElementById('statusDot');
             const text = document.getElementById('statusText');
-            
+
             if (connected) {
                 dot.classList.add('connected');
                 text.textContent = 'Connected';
@@ -246,7 +246,7 @@
                 text.textContent = 'Disconnected';
             }
         }
-        
+
         // ============== Heartbeat ==============
         function startHeartbeat() {
             heartbeatInterval = setInterval(async () => {
@@ -257,7 +257,7 @@
                 }
             }, HEARTBEAT_INTERVAL);
         }
-        
+
         // ============== Drive Control ==============
         function sendDriveCommand() {
             const now = Date.now();
@@ -265,7 +265,7 @@
                 return; // Rate limit
             }
             lastDriveSent = now;
-            
+
             apiPost('/api/drive', { x: currentJoyX, y: currentJoyY })
                 .then(result => {
                     if (result.status === 'ok') {
@@ -275,7 +275,7 @@
                 })
                 .catch(() => {});
         }
-        
+
         function startDriveLoop() {
             driveInterval = setInterval(() => {
                 if (currentJoyX !== 0 || currentJoyY !== 0) {
@@ -283,7 +283,7 @@
                 }
             }, DRIVE_SEND_INTERVAL);
         }
-        
+
         // ============== Joystick Setup ==============
         var Joy1 = new JoyStick('joyDiv', {
             internalFillColor: '#00ff88',
@@ -292,12 +292,12 @@
         }, function(stickData) {
             currentJoyX = parseInt(stickData.x);
             currentJoyY = parseInt(stickData.y);
-            
+
             // Update display
             document.getElementById('direction').textContent = stickData.cardinalDirection;
             const speed = Math.round(Math.sqrt(currentJoyX * currentJoyX + currentJoyY * currentJoyY));
             document.getElementById('speedVal').textContent = Math.min(speed, 100) + '%';
-            
+
             // Send command immediately on joystick move
             sendDriveCommand();
         });
@@ -307,7 +307,7 @@
      //   function toggleControlMode() {
        //     activeMode = document.getElementById('activeModeToggle').checked;
          //   const modeLabel = document.getElementById('modeLabel');
-            
+
            // if (activeMode) {
              //   modeLabel.textContent = 'Active Response';
                // log('Active Response Mode: Controls respond in real-time', 'success');
@@ -376,36 +376,27 @@
         }
 
         // ================ Guide =================
+
         function toggleGuide() {
-            activeMode = document.getElementById('guideToggle').checked;
-            const modeLabel = document.getElementById('guideLabel');
+         guideOn = document.getElementById('guideToggle').checked;
+         const modeLabel = document.getElementById('guideLabel');
 
-            if (activeMode) {
-                modeLabel.textContent = 'Guide On';
-                guideOn = true
-                apiPost('/api/guide', { })
-                    .then(result => {
-                        if (result.status === 'ok') {
-                            log('guide Mode: wall following on', 'success');
-                        }
-                    })
-                    .catch(() => {
-                    });
+          if (guideOn) {
+              modeLabel.textContent = 'Guide On';
+          } else {
+             modeLabel.textContent = 'Guide Off';
+          }
 
-            } else {
-                modeLabel.textContent = 'Guide Off';
-                followOn = false
-                apiPost('/api/guide', {})
-                    .then(result => {
-                        if (result.status === 'ok') {
-                            log('guide Mode: wall following off', 'success');
-                        }
-                    })
-                    .catch(() => {
-                    });
-
+    apiPost('/api/guide', { on: guideOn })
+        .then(result => {
+            if (result.status === 'ok') {
+                log(`Guide Mode: ${guideOn ? 'on' : 'off'}`, 'success');
             }
-        }
+        })
+        .catch(() => {
+            log('Guide API call failed', 'error');
+        });
+}
         // ============== Head Control ==============
         function updatePan(value) {
             document.getElementById('panValue').textContent = value;
@@ -418,7 +409,7 @@
                 }
             }
         }
-        
+
         function sendPan(value) {
             apiPost('/api/head/pan', { position: parseInt(value) })
                 .then(result => {
@@ -430,13 +421,13 @@
                 })
                 .catch(() => {});
         }
-        
+
         function centerPan() {
             document.getElementById('panSlider').value = 0;
             updatePan(0);
             sendPan(0);
         }
-        
+
         function updateTilt(value) {
             document.getElementById('tiltValue').textContent = value;
             // In active mode, send command immediately while moving (with throttling)
@@ -448,7 +439,7 @@
                 }
             }
         }
-        
+
         function sendTilt(value) {
             apiPost('/api/head/tilt', { position: parseInt(value) })
                 .then(result => {
@@ -460,13 +451,13 @@
                 })
                 .catch(() => {});
         }
-        
+
         function centerTilt() {
             document.getElementById('tiltSlider').value = 0;
             updateTilt(0);
             sendTilt(0);
         }
-        
+
         // ============== Waist Control ==============
         function updateWaist(value) {
             document.getElementById('waistValue').textContent = value;
@@ -479,7 +470,7 @@
                 }
             }
         }
-        
+
         function sendWaist(value) {
             apiPost('/api/waist', { position: parseInt(value) })
                 .then(result => {
@@ -491,13 +482,13 @@
                 })
                 .catch(() => {});
         }
-        
+
         function centerWaist() {
             document.getElementById('waistSlider').value = 0;
             updateWaist(0);
             sendWaist(0);
         }
-        
+
         // ============== Voice Control ==============
         function speak(phraseIndex) {
             apiPost('/api/speak', { phrase_index: phraseIndex })
@@ -508,7 +499,7 @@
                 })
                 .catch(() => {});
         }
-        
+
         // ============== Dialog Control ==============
         function appendDialogMessage(sender, text, cssClass) {
             const log = document.getElementById('dialogLog');
@@ -518,16 +509,16 @@
             log.appendChild(entry);
             log.scrollTop = log.scrollHeight;
         }
-        
+
         async function sendDialog() {
             const input = document.getElementById('dialogInput');
             const text = input.value.trim();
             if (!text) return;
-            
+
             input.value = '';
             appendDialogMessage('You', text, 'dialog-user');
             log('Dialog input: ' + text);
-            
+
             try {
                 const result = await apiPost('/api/dialog', { text: text });
                 if (result.status === 'ok') {
@@ -544,7 +535,7 @@
                 log('Dialog request failed', 'error');
             }
         }
-        
+
         async function resetDialog() {
             document.getElementById('dialogLog').innerHTML = '';
             try {
@@ -554,21 +545,21 @@
                 log('Dialog reset failed', 'error');
             }
         }
-        
+
         // ============== Emergency Stop ==============
         function emergencyStop() {
             log('EMERGENCY STOP triggered!', 'error');
-            
+
             // Reset joystick state
             currentJoyX = 0;
             currentJoyY = 0;
-            
+
             // Reset UI
             document.getElementById('leftSpeed').textContent = '0';
             document.getElementById('rightSpeed').textContent = '0';
             document.getElementById('direction').textContent = 'C';
             document.getElementById('speedVal').textContent = '0%';
-            
+
             // Send stop command
             apiPost('/api/stop', {})
                 .then(result => {
@@ -608,7 +599,7 @@
         }
 
         // ============== Page Lifecycle ==============
-        
+
         // Handle page refresh/close - send stop command
         window.addEventListener('beforeunload', function(e) {
             // Try to stop robot before page unloads
@@ -616,7 +607,7 @@
             const blob = new Blob([JSON.stringify({})], { type: 'application/json' });
             navigator.sendBeacon('/api/stop', blob);
         });
-        
+
         // Handle page visibility change (tab switch, minimize)
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
@@ -624,17 +615,17 @@
                 emergencyStop();
             }
         });
-        
+
         // ============== Initialization ==============
         window.onload = function() {
             log('Robot Control Interface loaded');
-            
+
             // Start heartbeat
             startHeartbeat();
-            
+
             // Start drive loop
             startDriveLoop();
-            
+
             // Initial connection check
             apiPost('/api/heartbeat', {})
                 .then(() => log('Connected to robot server', 'success'))

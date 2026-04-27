@@ -133,7 +133,7 @@ def listen_complete(model_path: str, phrases: dict[str, callable], sample_rate: 
 
 def listen():
     time.sleep(2)
-    return "robot lab"
+    return "bathroom"
 
 
 class RobotGuide:
