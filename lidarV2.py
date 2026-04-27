@@ -3,7 +3,7 @@ import robot_control
 from math import floor
 import time
 import atexit
-import wall_follow_new
+import wall_follow
 import math
 
 forward_left = -1
@@ -33,10 +33,6 @@ class Lidar:
         self.left = 0
         self.left_back = 0
         self.left_front = 0
-        self.scan_data = [0] * 360
-        self.intersect_flag = False
-        self.robot.FollowMode = True
-
 
     def get_info(self):
         lidar = PyRPlidar()
@@ -92,11 +88,13 @@ class Lidar:
 
         scan_generator = self.lidar.force_scan()
         print("5------------------")
-
+        scan_data = [0] * 360
         count = 0
         try:
+            self.robot.FollowOn = False
+            self.robot.FollowSide = False
             for count, scan in enumerate(scan_generator()):
-                self.scan_data[min([359, floor(scan.angle)])] = scan.distance
+                scan_data[min([359, floor(scan.angle)])] = scan.distance
 
                 # -------------------------------------------------------------
                 if 260 < scan.angle < 280:
@@ -118,23 +116,9 @@ class Lidar:
                 # -------------------------------------------------------------
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
-                    left_speed, right_speed = wall_follow_new.find_speeds(self.scan_data, -50, True)
+                    left_speed, right_speed = wall_follow.find_speeds(scan_data, -50, self.robot.FollowMode)
                     self.robot.drive(left_speed, right_speed)
-                    '''
-                    print(self.scan_data[240])
-                    print(left_speed, right_speed)
-                    if (right_speed + left_speed) > 30:
-                        self.intersect_flag = True
-                    else:
-                        self.intersect_flag = False
 
-                    print(self.intersect_flag)
-                                     
-                     if self.scan_data[240] > 1600:
-                        self.intersect_flag = True
-                    else:
-                        self.intersect_flag = False
-                    '''
                     '''
                     #if self.follow == "right":
                     self.left = average(scan_data[175:185])
@@ -203,6 +187,5 @@ class Lidar:
 if __name__ == "__main__":
     lidar = Lidar()
     lidar.simple_scan()
-
 
 
