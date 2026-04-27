@@ -181,8 +181,13 @@ class RobotGuide:
         self.robot.FollowOn = True
         intersection = False
         time.sleep(2)
+        i = 0
         while not intersection:
-            intersection = self.robot.lidar.intersect_flag
+            #intersection = self.robot.lidar.intersect_flag
+            time.sleep(1)
+            i += 1
+            if i == 5:
+                intersection = True
         time.sleep(0.3)
         self.robot_guide_machine.send("intersection_detected")
 
