@@ -168,6 +168,9 @@ class RobotGuide:
         self.robot.drive_joystick(50, 50)
         time.sleep(1.1)
         self.robot.drive_joystick(0, 0)
+        self.robot.drive_joystick(0, 50)
+        time.sleep(1)
+        self.robot.drive_joystick(0, 0)
         print("turning...")
         self.robot_guide_machine.send("turning_around_complete")
 
@@ -227,6 +230,7 @@ class RobotGuide:
 
     def listen_fake(self):
         listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom})
+
 
 
 
