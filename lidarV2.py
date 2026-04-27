@@ -122,7 +122,7 @@ class Lidar:
 
                     print(self.scan_data[240])
                     print(left_speed, right_speed)
-                    if (right_speed + left_speed) > 20:
+                    if (right_speed + left_speed) > 30:
                         self.intersect_flag = True
                     else:
                         self.intersect_flag = False
