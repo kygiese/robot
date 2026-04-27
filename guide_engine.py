@@ -176,7 +176,7 @@ class RobotGuide:
         self.robot.drive_joystick(0,50)
         time.sleep(1)
         self.robot.drive_joystick(0,0)
-        self.robot_guide_machine.send("aligning_complete")
+        #self.robot_guide_machine.send("aligning_complete")
 
     def on_aligning_complete(self):
         print("driving...")
