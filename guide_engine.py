@@ -177,11 +177,11 @@ class RobotGuide:
 
     def on_aligning_complete(self):
         print("driving...")
-       # self.robot.FollowOn = True
+        self.robot.FollowOn = True
         intersection = False
         time.sleep(2)
-        while not intersection:
-            intersection = self.robot.lidar.intersect_flag
+        #while not intersection:
+        #    intersection = self.robot.lidar.intersect_flag
         time.sleep(0.5)
         self.robot_guide_machine.send("intersection_detected")
 
@@ -223,6 +223,7 @@ class RobotGuide:
 
     def listen_fake(self):
         listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom})
+
 
 
 
