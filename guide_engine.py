@@ -179,7 +179,7 @@ class RobotGuide:
     def on_aligning_complete(self):
         print("driving...")
         self.robot.FollowOn = True
-        self.robot.drive_joystick(0, 50)
+        #self.robot.drive_joystick(0, 50)
         # = False
         #time.sleep(2)
         #self.robot.drive_joystick(0, 0)
