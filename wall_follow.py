@@ -28,11 +28,7 @@ def find_speeds(scan_data, default_speed, wall_side):
 
     m,b = np.polyfit(x_arr, y_arr, 1)
 
-#----------------- distance calc -------
-    distance = 800 # the wanted distance
-    mesuredDistance = abs(b)/math.sqrt(m**2 +1)
-    distanceTarget = mesuredDistance - distance
-#--------------  ------------ - -- -
+
 
 
 
@@ -40,8 +36,18 @@ def find_speeds(scan_data, default_speed, wall_side):
     target_y = (m * target_x + b)
 
     if wall_side:  # left wall
-        target_y -= (distanceTarget * 2)
+        # ----------------- distance calc -------
+        distance = 800  # the wanted distance
+        mesuredDistance = abs(b) / math.sqrt(m ** 2 + 1)
+        distanceTarget = mesuredDistance - distance
+        # --------------  ------------ - -- -
+        target_y += (distanceTarget * 2) if mesuredDistance < 0 else -(distanceTarget * 2)
     else:
+        # ----------------- distance calc -------
+        distance = 800  # the wanted distance
+        mesuredDistance = abs(b) / math.sqrt(m ** 2 + 1)
+        distanceTarget = mesuredDistance - distance
+        # --------------  ------------ - -- -
         target_y += (distanceTarget * 2) if mesuredDistance < 0 else -(distanceTarget * 2)
 
 
