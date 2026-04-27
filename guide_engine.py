@@ -178,14 +178,14 @@ class RobotGuide:
 
     def on_aligning_complete(self):
         print("driving...")
-        #self.robot.FollowOn = True
+        self.robot.FollowOn = True
         self.robot.drive_joystick(0, 50)
-        intersection = False
-        time.sleep(2)
-        self.robot.drive_joystick(0, 0)
+        # = False
+        #time.sleep(2)
+        #self.robot.drive_joystick(0, 0)
        # while not intersection:
         #    intersection = self.robot.lidar.intersect_flag
-        time.sleep(0.3)
+        time.sleep(5)
         self.robot_guide_machine.send("intersection_detected")
 
     def on_intersection_detected(self):
