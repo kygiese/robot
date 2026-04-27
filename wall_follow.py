@@ -46,9 +46,9 @@ def find_speeds(scan_data, default_speed, wall_side):
     target_y = (m * target_x + b)
 
     if wall_side:  # left wall
-        target_y -= (distanceTarget * 2) if mesuredDistance > 0 else -(distanceTarget * 2)
+        target_y -= (distanceTarget ) if mesuredDistance > 0 else -(distanceTarget )
     else:
-        target_y += (distanceTarget * 2) if mesuredDistance < 0 else -(distanceTarget * 2)
+        target_y += (distanceTarget ) if mesuredDistance < 0 else -(distanceTarget )
 
 
     ld = math.sqrt(target_x**2 + target_y**2)
