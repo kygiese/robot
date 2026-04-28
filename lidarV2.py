@@ -123,12 +123,12 @@ class Lidar:
 
                     if self.robot.FollowMode:
                     #print(left_speed, right_speed)
-                        if  scan_data[180] > 1400:
+                        if  scan_data[180] > 1000:
                                 self.intersect_flag = True
                         else:
                             self.intersect_flag = False
                     else:
-                        if  scan_data[0] > 1400:
+                        if  scan_data[0] > 1000:
                                 self.intersect_flag = True
                         else:
                             self.intersect_flag = False
