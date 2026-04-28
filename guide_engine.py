@@ -177,7 +177,10 @@ class RobotGuide:
     def on_response_detected(self):
         time.sleep(2)
         self.robot.drive_joystick(50, 50)
-        time.sleep(1.1)
+        if self.destination == "bathroom":
+            time.sleep(1)
+        else:
+            time.sleep(1.2)
         self.robot.drive_joystick(0, 0)
         print("turning...")
         self.robot_guide_machine.send("turning_around_complete")
@@ -208,14 +211,15 @@ class RobotGuide:
             #self.robot.drive_joystick(50, 50)
             pass
         else:
-            self.robot.drive_joystick(-50, 50)
+            #self.robot.drive_joystick(-50, 50)
+            pass
         time.sleep(0.4)
         self.robot_guide_machine.send("turning_complete")
 
     def on_turning_complete(self):
         print("driving...")
         self.robot.drive_joystick(0, 50)
-        time.sleep(2)
+        time.sleep(1)
         self.robot.drive_joystick(0, 0)
         self.robot_guide_machine.send("destination_reached")
 
