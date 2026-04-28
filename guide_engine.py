@@ -205,7 +205,8 @@ class RobotGuide:
         self.robot.stop()
         print("turning...")
         if self.destination == "robot lab":
-            self.robot.drive_joystick(50, 50)
+            #self.robot.drive_joystick(50, 50)
+            pass
         else:
             self.robot.drive_joystick(-50, 50)
         time.sleep(0.4)
@@ -251,6 +252,7 @@ class RobotGuide:
                 stop_event.set()
 
         print(f"Worker done")
+
 
 
 
