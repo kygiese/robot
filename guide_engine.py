@@ -62,53 +62,41 @@ def average(scan_data):
     return s / i
 
 
-def listen_complete( model_path: str,
-    phrases: dict[str, callable],
+def listen_complete(model_path: str,
+    phrases: list[str],
     sample_rate: int = 16000,
     device_index: int = None,
     chunk_size: int = 8000,
-):
+) -> str:
     """
-    Continuously listens to microphone input and triggers a per-phrase
-    callback whenever a registered phrase is detected.
+    Listens to microphone input and returns the first matching phrase found.
 
     Args:
         model_path:   Path to a local Vosk model directory.
-                      Download models from https://alphacephei.com/vosk/models
-                      e.g. "models/vosk-model-small-en-us-0.15"
-        phrases:      Dict mapping phrase strings to callback functions.
-                      Each callback receives (phrase, transcript) as arguments.
-                      Example: {"robot lab": on_robot_lab, "launch sequence": on_launch}
+        phrases:      List of phrases to listen for.
         sample_rate:  Microphone sample rate in Hz (Vosk expects 16000).
-        device_index: PyAudio device index to use. Defaults to system default.
-                      Run list_input_devices() to find the right index.
+        device_index: PyAudio device index. Run list_input_devices() to find it.
         chunk_size:   Audio chunk size in frames.
-    """
-    if not phrases:
-        raise ValueError("Provide at least one phrase to listen for.")
 
+    Returns:
+        The first phrase detected.
+    """
     print(f"Loading Vosk model from '{model_path}'...")
     model = Model(model_path)
     recognizer = KaldiRecognizer(model, sample_rate)
     recognizer.SetWords(True)
 
-    phrase_list = {p.lower(): cb for p, cb in phrases.items()}
-    print(f"Listening for: {list(phrase_list.keys())}... (Ctrl+C to stop)\n")
+    phrase_list = [p.lower() for p in phrases]
+    result_queue = queue.Queue()
 
-    def check_and_dispatch(text: str, is_partial: bool = False):
-        for phrase, callback in phrase_list.items():
+    print(f"Listening for: {phrase_list}... (Ctrl+C to stop)\n")
+
+    def check_and_dispatch(text: str):
+        for phrase in phrase_list:
             if phrase in text:
-                label = "partial" if is_partial else "heard"
-                print(f"  [{label}] '{text}'")
-                print(f"  ✅ Matched: '{phrase}'")
-                callback(phrase, text)
+                result_queue.put(phrase)
 
     p = pyaudio.PyAudio()
-
-    idx = device_index if device_index is not None else p.get_default_input_device_info()["index"]
-    info = p.get_device_info_by_index(idx)
-    print(f"Using device: [{info['index']}] {info['name']}\n")
-
     stream = p.open(
         format=pyaudio.paInt16,
         channels=1,
@@ -119,25 +107,25 @@ def listen_complete( model_path: str,
     )
 
     try:
-        while True:
+        while result_queue.empty():
             data = stream.read(chunk_size, exception_on_overflow=False)
 
             if recognizer.AcceptWaveform(data):
                 result = json.loads(recognizer.Result())
                 transcript = result.get("text", "").lower()
                 if transcript:
-                    check_and_dispatch(transcript, is_partial=False)
+                    check_and_dispatch(transcript)
             else:
                 partial = json.loads(recognizer.PartialResult())
                 partial_text = partial.get("partial", "").lower()
                 if partial_text:
-                    check_and_dispatch(partial_text, is_partial=True)
+                    check_and_dispatch(partial_text)
+
+        return result_queue.get()
 
     except KeyboardInterrupt:
         print("\nStopped.")
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        raise
+        return None
     finally:
         stream.stop_stream()
         stream.close()
@@ -148,6 +136,13 @@ def listen():
     time.sleep(2)
     return "robot lab"
 
+
+def listen_fake():
+    phrase = listen_complete(
+        model_path=MODEL_PATH,
+        phrases=["robot lab", "launch sequence"],
+    )
+    return phrase
 
 
 class RobotGuide:
@@ -177,7 +172,7 @@ class RobotGuide:
     def on_greeting_finished(self):
         print("listening...")
         self.robot.FollowSide = True
-        self.robot_guide_machine.send("response_detected", self.listen_fake())
+        self.robot_guide_machine.send("response_detected", listen_fake())
 
     def on_response_detected(self):
         self.robot.drive_joystick(50, 50)
@@ -239,9 +234,6 @@ class RobotGuide:
     def on_bathroom(self, phrase, transcript):
         print(f"  → Bathroom initiated!\n")
         self.destination = "bathroom"
-
-    def listen_fake(self):
-        listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom}, device_index=1)
 
     def worker(self, stop_event: threading.Event):
         """
