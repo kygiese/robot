@@ -203,7 +203,10 @@ class RobotGuide:
         self.robot.FollowOn = False
         self.robot.stop()
         print("turning...")
-        #self.robot.drive_joystick(50, 50)
+        if self.destination == "robot lab":
+            self.robot.drive_joystick(50, 50)
+        else:
+            self.robot.drive_joystick(-50, 50)
         time.sleep(0.4)
         self.robot_guide_machine.send("turning_complete")
 
@@ -215,7 +218,7 @@ class RobotGuide:
         self.robot_guide_machine.send("destination_reached")
 
     def after_destination_reached(self):
-        self.tts.speak("We have arrived", None, False)
+        self.tts.speak("We have arrived at the " + self.destination, None, False)
         print("speaking...")
 
     def guide(self):
