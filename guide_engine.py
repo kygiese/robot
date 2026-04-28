@@ -102,6 +102,7 @@ def listen_complete( model_path: str,
                 print(f"  [{label}] '{text}'")
                 print(f"  ✅ Matched: '{phrase}'")
                 callback(phrase, text)
+                return phrase
 
     p = pyaudio.PyAudio()
 
@@ -241,7 +242,7 @@ class RobotGuide:
         self.destination = "bathroom"
 
     def listen_fake(self):
-        listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom}, device_index=1)
+        return listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom}, device_index=1)
 
     def worker(self, stop_event: threading.Event):
         """
