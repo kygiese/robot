@@ -180,7 +180,7 @@ class RobotGuide:
         if self.destination == "bathroom":
             time.sleep(1)
         else:
-            time.sleep(1.2)
+            time.sleep(1.4)
         self.robot.drive_joystick(0, 0)
         print("turning...")
         self.robot_guide_machine.send("turning_around_complete")
