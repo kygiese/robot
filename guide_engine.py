@@ -140,7 +140,7 @@ def listen():
 def listen_fake():
     phrase = listen_complete(
         model_path=MODEL_PATH,
-        phrases=["robot lab", "launch sequence"],
+        phrases=["robot lab", "bathroom"],
     )
     return phrase
 
