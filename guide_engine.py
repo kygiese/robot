@@ -102,7 +102,6 @@ def listen_complete( model_path: str,
                 print(f"  [{label}] '{text}'")
                 print(f"  ✅ Matched: '{phrase}'")
                 callback(phrase, text)
-                return phrase
 
     p = pyaudio.PyAudio()
 
@@ -127,12 +126,12 @@ def listen_complete( model_path: str,
                 result = json.loads(recognizer.Result())
                 transcript = result.get("text", "").lower()
                 if transcript:
-                    return check_and_dispatch(transcript, is_partial=False)
+                    check_and_dispatch(transcript, is_partial=False)
             else:
                 partial = json.loads(recognizer.PartialResult())
                 partial_text = partial.get("partial", "").lower()
                 if partial_text:
-                    return check_and_dispatch(partial_text, is_partial=True)
+                    check_and_dispatch(partial_text, is_partial=True)
 
     except KeyboardInterrupt:
         print("\nStopped.")
@@ -242,7 +241,7 @@ class RobotGuide:
         self.destination = "bathroom"
 
     def listen_fake(self):
-        return listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom}, device_index=1)
+        listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom}, device_index=1)
 
     def worker(self, stop_event: threading.Event):
         """
