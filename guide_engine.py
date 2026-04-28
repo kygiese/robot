@@ -6,6 +6,7 @@ import queue
 import sys
 import threading
 
+import pyaudio
 import sounddevice as sd
 
 
@@ -61,19 +62,27 @@ def average(scan_data):
     return s / i
 
 
-def listen_complete(model_path: str, phrases: dict[str, callable], sample_rate: int = 16000):
+def listen_complete( model_path: str,
+    phrases: dict[str, callable],
+    sample_rate: int = 16000,
+    device_index: int = None,
+    chunk_size: int = 8000,
+):
     """
     Continuously listens to microphone input and triggers a per-phrase
     callback whenever a registered phrase is detected.
 
     Args:
-    model_path:  Path to a local Vosk model directory.
-                 Download models from https://alphacephei.com/vosk/models
-                 e.g. "models/vosk-model-small-en-us-0.15"
-    phrases:     Dict mapping phrase strings to callback functions.
-                 Each callback receives (phrase, transcript) as arguments.
-                 Example: {"robot lab": on_robot_lab, "launch sequence": on_launch}
-    sample_rate: Microphone sample rate in Hz (Vosk expects 16000).
+        model_path:   Path to a local Vosk model directory.
+                      Download models from https://alphacephei.com/vosk/models
+                      e.g. "models/vosk-model-small-en-us-0.15"
+        phrases:      Dict mapping phrase strings to callback functions.
+                      Each callback receives (phrase, transcript) as arguments.
+                      Example: {"robot lab": on_robot_lab, "launch sequence": on_launch}
+        sample_rate:  Microphone sample rate in Hz (Vosk expects 16000).
+        device_index: PyAudio device index to use. Defaults to system default.
+                      Run list_input_devices() to find the right index.
+        chunk_size:   Audio chunk size in frames.
     """
     if not phrases:
         raise ValueError("Provide at least one phrase to listen for.")
@@ -83,18 +92,10 @@ def listen_complete(model_path: str, phrases: dict[str, callable], sample_rate: 
     recognizer = KaldiRecognizer(model, sample_rate)
     recognizer.SetWords(True)
 
-    audio_queue = queue.Queue()
     phrase_list = {p.lower(): cb for p, cb in phrases.items()}
-
-    print(f"Listening for: {[p for p in phrase_list]}... (Ctrl+C to stop)\n")
-
-    def audio_callback(indata, frames, time, status):
-        if status:
-            print(f"[audio warning] {status}", file=sys.stderr)
-        audio_queue.put(bytes(indata))
+    print(f"Listening for: {list(phrase_list.keys())}... (Ctrl+C to stop)\n")
 
     def check_and_dispatch(text: str, is_partial: bool = False):
-        """Check transcript against all phrases and fire matching callbacks."""
         for phrase, callback in phrase_list.items():
             if phrase in text:
                 label = "partial" if is_partial else "heard"
@@ -102,33 +103,45 @@ def listen_complete(model_path: str, phrases: dict[str, callable], sample_rate: 
                 print(f"  ✅ Matched: '{phrase}'")
                 callback(phrase, text)
 
-    try:
-        with sd.RawInputStream(
-            samplerate=sample_rate,
-            blocksize=8000,
-            dtype="int16",
-            channels=1,
-            callback=audio_callback,
-        ):
-            while True:
-                data = audio_queue.get()
+    p = pyaudio.PyAudio()
 
-                if recognizer.AcceptWaveform(data):
-                    result = json.loads(recognizer.Result())
-                    transcript = result.get("text", "").lower()
-                    if transcript:
-                        check_and_dispatch(transcript, is_partial=False)
-                else:
-                    partial = json.loads(recognizer.PartialResult())
-                    partial_text = partial.get("partial", "").lower()
-                    if partial_text:
-                        check_and_dispatch(partial_text, is_partial=True)
+    idx = device_index if device_index is not None else p.get_default_input_device_info()["index"]
+    info = p.get_device_info_by_index(idx)
+    print(f"Using device: [{info['index']}] {info['name']}\n")
+
+    stream = p.open(
+        format=pyaudio.paInt16,
+        channels=1,
+        rate=sample_rate,
+        input=True,
+        input_device_index=device_index,
+        frames_per_buffer=chunk_size,
+    )
+
+    try:
+        while True:
+            data = stream.read(chunk_size, exception_on_overflow=False)
+
+            if recognizer.AcceptWaveform(data):
+                result = json.loads(recognizer.Result())
+                transcript = result.get("text", "").lower()
+                if transcript:
+                    check_and_dispatch(transcript, is_partial=False)
+            else:
+                partial = json.loads(recognizer.PartialResult())
+                partial_text = partial.get("partial", "").lower()
+                if partial_text:
+                    check_and_dispatch(partial_text, is_partial=True)
 
     except KeyboardInterrupt:
         print("\nStopped.")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         raise
+    finally:
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
 
 
 def listen():
@@ -228,7 +241,7 @@ class RobotGuide:
         self.destination = "bathroom"
 
     def listen_fake(self):
-        listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom})
+        listen_complete(model_path=MODEL_PATH, phrases={"robot lab": self.on_robot_lab, "bathroom": self.on_bathroom}, device_index=1)
 
     def worker(self, stop_event: threading.Event):
         """
