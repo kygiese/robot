@@ -127,12 +127,12 @@ def listen_complete( model_path: str,
                 result = json.loads(recognizer.Result())
                 transcript = result.get("text", "").lower()
                 if transcript:
-                    check_and_dispatch(transcript, is_partial=False)
+                    return check_and_dispatch(transcript, is_partial=False)
             else:
                 partial = json.loads(recognizer.PartialResult())
                 partial_text = partial.get("partial", "").lower()
                 if partial_text:
-                    check_and_dispatch(partial_text, is_partial=True)
+                    return check_and_dispatch(partial_text, is_partial=True)
 
     except KeyboardInterrupt:
         print("\nStopped.")
