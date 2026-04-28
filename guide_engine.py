@@ -175,6 +175,7 @@ class RobotGuide:
         self.robot_guide_machine.send("response_detected", listen_fake())
 
     def on_response_detected(self):
+        time.sleep(2)
         self.robot.drive_joystick(50, 50)
         time.sleep(1.1)
         self.robot.drive_joystick(0, 0)
