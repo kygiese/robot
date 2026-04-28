@@ -122,7 +122,7 @@ class Lidar:
                     self.robot.drive(left_speed, right_speed)
 
                     #print(left_speed, right_speed)
-                    if  scan_data[180] > 1600:
+                    if  scan_data[180] > 1200:
                         self.intersect_flag = True
                     else:
                         self.intersect_flag = False
