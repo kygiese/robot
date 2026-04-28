@@ -187,6 +187,7 @@ class RobotGuide:
 
     def on_turning_around_complete(self):
         print("finding wall...")
+        time.sleep(2)
         self.robot_guide_machine.send("aligning_complete")
 
     def on_aligning_complete(self):
