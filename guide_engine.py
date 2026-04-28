@@ -160,7 +160,7 @@ class RobotGuide:
             return True
         if response == "robot lab":
             self.destination = "robot lab"
-            self.robot.FollowMode = True
+            self.robot.FollowMode = False
             return True
         return False
 
