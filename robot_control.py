@@ -158,7 +158,7 @@ class RobotControl:
         self._init_components()
 
         # Start safety monitoring
-        self._start_safety_monitor()
+        #self._start_safety_monitor()
 
         atexit.register(self.shutdown)
 
@@ -191,13 +191,15 @@ class RobotControl:
                 print(self._lidar.checkB)
                 print(self._lidar.checkF)
 
+                self.currentSpeedR = 0
+                self.currentSpeedL = 0
+
                 time.sleep(6)
 
                 #self.drive_joystick(0, 50)
                 #time.sleep(2)
                 #self.drive_joystick(0,0)
-                self.currentSpeedR = 0
-                self.currentSpeedL = 0
+                
 
             # Set to neutral/center position
             self.stop()
