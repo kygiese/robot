@@ -129,6 +129,7 @@ class RobotControl:
         Args:
             mock_mode: If True, use mock controllers. If None, auto-detect.
         """
+        self.guide = RobotGuide(self)
         self.FollowMode = None
         self.FollowOn = None
         self.currentSpeedL = 0
@@ -617,5 +618,4 @@ if __name__ == "__main__":
     robot.shutdown()
     '''
     robot = RobotControl()
-    guide = RobotGuide(robot)
-    guide.guide()
+    self.guide.guide()

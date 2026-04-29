@@ -198,8 +198,6 @@ class RobotGuide:
         thread = threading.Thread(target=self.worker, args=(stop_event,))
         thread.start()
         thread.join()
-        #while not intersection:
-        #    intersection = self.robot.lidar.intersect_flag
         time.sleep(0.5)
         self.robot_guide_machine.send("intersection_detected")
 
