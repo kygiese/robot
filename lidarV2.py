@@ -98,6 +98,8 @@ class Lidar:
 
                 # -------------------------------------------------------------
                 if 260 < scan.angle < 280:
+                    if scan.distance == 0:
+                        self.checkF = False
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL < 0 < self.robot.currentSpeedR:
                             self.robot.drive(0, 0)
@@ -106,6 +108,8 @@ class Lidar:
                         self.checkF = False
 
                 if 120 < scan.angle < 140:
+                    if scan.distance == 0:
+                        self.checkB = False
                     if 0 < scan.distance < 600:
                         if self.robot.currentSpeedL > 0 > self.robot.currentSpeedR:
                             self.robot.drive(0, 0)
@@ -114,7 +118,8 @@ class Lidar:
                     else:
                         self.checkB = False
 
-
+                print(scan.angle, scan.distance)
+                print(self.checkF, self.checkB)
                 # -------------------------------------------------------------
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:

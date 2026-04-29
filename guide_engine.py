@@ -176,11 +176,11 @@ class RobotGuide:
 
     def on_response_detected(self):
         time.sleep(2)
-        self.robot.drive_joystick(50, 50)
+        self.robot.drive_joystick(30, 30)
         if self.destination == "bathroom":
-            time.sleep(1)
+            time.sleep(1.1)
         else:
-            time.sleep(1.4)
+            time.sleep(1.5)
         self.robot.drive_joystick(0, 0)
         print("turning...")
         self.robot_guide_machine.send("turning_around_complete")
