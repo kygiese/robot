@@ -191,8 +191,7 @@ class RobotControl:
                 print(self._lidar.checkF)
 
                 time.sleep(6)
-                guide_engine = RobotGuide(self)
-                guide_engine.guide()
+
                 #self.drive_joystick(0, 50)
                 #time.sleep(2)
                 #self.drive_joystick(0,0)
@@ -583,6 +582,7 @@ def get_robot(mock_mode=None):
 
 # For direct testing
 if __name__ == "__main__":
+    '''
     print("Testing Robot Control Layer")
     robot = RobotControl(mock_mode=True)
 
@@ -615,3 +615,7 @@ if __name__ == "__main__":
 
     print("\nRobot Control Layer test complete!")
     robot.shutdown()
+    '''
+    robot = RobotControl()
+    guide = RobotGuide(robot)
+    guide.guide()
