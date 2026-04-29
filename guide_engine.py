@@ -194,10 +194,10 @@ class RobotGuide:
         self.robot.FollowOn = True
         print(self.robot.FollowMode)
         time.sleep(3)
-        #stop_event = threading.Event()
-        #thread = threading.Thread(target=self.worker, args=(stop_event,))
-        #thread.start()
-        #thread.join()
+        stop_event = threading.Event()
+        thread = threading.Thread(target=self.worker, args=(stop_event,))
+        thread.start()
+        thread.join()
         #while not intersection:
         #    intersection = self.robot.lidar.intersect_flag
         time.sleep(0.5)
