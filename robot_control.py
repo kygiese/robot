@@ -618,4 +618,4 @@ if __name__ == "__main__":
     robot.shutdown()
     '''
     robot = RobotControl()
-    self.guide.guide()
+    robot.guide.guide()
