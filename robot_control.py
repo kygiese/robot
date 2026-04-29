@@ -619,3 +619,4 @@ if __name__ == "__main__":
     '''
     robot = RobotControl()
     robot.guide.guide()
+    robot.shutdown()
