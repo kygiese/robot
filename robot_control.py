@@ -213,6 +213,7 @@ class RobotControl:
             self._waist_component = MockWaist(SERVO_MIN, SERVO_MAX)
             self._arm = MockArm(SERVO_MIN, SERVO_MAX)
 
+    '''
     def _start_safety_monitor(self):
         """Start the safety monitoring thread"""
         self._running = True
@@ -230,6 +231,7 @@ class RobotControl:
                     # No recent commands - stop wheels for safety
                     if self._left_wheel_speed != 0 or self._right_wheel_speed != 0:
                         self._set_wheel_speeds_internal(0, 0)
+    '''
 
     def _validate_speed(self, value):
         """Validate and clamp speed value to -100 to 100 range"""

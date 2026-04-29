@@ -125,10 +125,11 @@ class Lidar:
                     else:
                         self.intersect_flag = False
 
+                    '''
                     print(self.intersect_flag)
                     print(scan_data[180], scan_data[0])
 
-                    '''
+                    
                     #if self.follow == "right":
                     self.left = average(scan_data[175:185])
                     self.left_back = average(scan_data[145:155]) #125, 135
