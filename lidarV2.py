@@ -118,8 +118,9 @@ class Lidar:
                     else:
                         self.checkB = False
 
-                print(scan.angle, scan.distance)
-                print(self.checkF, self.checkB)
+                if scan.angle == 0 or scan.angle == 180 or scan.angle == 270 or scan.angle == 359:
+                    print(scan.angle, scan.distance)
+                    print(self.checkF, self.checkB)
                 # -------------------------------------------------------------
 
                 if count % 360 == 0 and count > 1 and self.robot.FollowOn:
